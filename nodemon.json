@@ -1,0 +1,8 @@
+{
+    "verbose": true,
+    "ignore": ["/servers/data.json", "TODO.MD"],
+    "execMap": {
+      "rb": "ruby",
+      "pde": "processing --sketch={{pwd}} --run"
+    }
+  }

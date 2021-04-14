@@ -1,0 +1,81 @@
+const { Command } = require("discord.js-commando");
+const dotenv = require("dotenv");
+const { MessageEmbed } = require("discord.js");
+const rp = require("request-promise");
+dotenv.config();
+
+module.exports = class statsCommand extends Command {
+	constructor(client) {
+		super(client, {
+			name: "stats",
+			group: "first",
+			memberName: "stats",
+			description: "Replies with a set of CS:GO stats.",
+			args: [
+				{
+					key: "text",
+					prompt: "Steam profile link",
+					type: "string",
+				},
+			],
+		});
+	}
+
+	async run(message, { text }) {
+		const things = {
+			apiKey : process.env.STEAMSECRET,
+			target : text,
+			appid : "730",
+		};
+		if (text.toLowerCase().includes("steamcommunity.com/id/")) {
+			const regex = /([/A-Z/])\w*/g;
+			const extracted = text.match(regex);
+			const URL = extracted[3].replace("/", "");
+			const qString = `http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${things.apiKey}&vanityurl=${URL}`;
+			// eslint-disable-next-line max-statements-per-line
+			await rp(qString).then(res => {const data = JSON.parse(res);things.target = data.response.steamid;}).catch(err => console.log(err));
+		}
+		else if (text.toLowerCase().includes("steamcommunity.com/profiles/")) {
+			const regex = /([\d])\w+/g;
+			const extracted = text.match(regex);
+			things.target = extracted[0];
+		}
+		else if (text.match(/([\d]){17}/g)) {
+			if (text.match(/([\d]){17}/g).length !== 1) {return message.say("Steam API couldn't find the provided account. Double check your syntax and try again.");}
+			console.log("steam id provided");
+		}
+		else {return message.say("Steam API couldn't find the provided account. Double check your syntax and try again.");}
+		const url1 = { uri: `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${things.apiKey}&steamids=${things.target}` };
+		const url2 = { uri: `http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=${things.appid}&key=${things.apiKey}&steamid=${things.target}` };
+		rp(url1)
+			.then(response => {
+				url2.url1res = response;
+				return rp(url2);
+			})
+			.then(response => {
+				const steamStats = JSON.parse(response);
+				const steamProfile = JSON.parse(url2.url1res).response.players[0];
+				let kd = steamStats.playerstats.stats[0].value / steamStats.playerstats.stats[1].value;
+				kd = Math.round(Number(kd) * 100) / 100;
+				const embedMessage = new MessageEmbed()
+					.setTitle(steamProfile.personaname)
+					.setColor("#FFA500")
+					.setDescription("CSGO Stats")
+					.setThumbnail(steamProfile.avatarfull)
+					.addFields(
+						{ name: "Lifetime Kills", value:steamStats.playerstats.stats[0].value, inline: true },
+						{ name: "Lifetime Deaths", value:steamStats.playerstats.stats[1].value, inline: true },
+						{ name: "K/D", value:kd, inline: true },
+						{ name: "Real Playtime", value: Math.floor((steamStats.playerstats.stats[2].value / 60) / 60) + " hours" },
+					)
+					.setTimestamp()
+					.setFooter("Ricksaw CSGO Bot");
+				rp.post({
+					uri:"http://localhost:3000/api/data",
+					json:{ "command":"stats" },
+				}).then(console.log("Succesful transaction with back end.")).catch(console.log);
+				return message.say(embedMessage);
+			})
+			.catch(err => console.log(err));
+	}
+};

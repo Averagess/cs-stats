@@ -1,0 +1,20 @@
+GET http://localhost:3000/api/gamedata
+content-type: application/json
+
+{
+    "id":"76561198116173009"
+}
+###
+POST http://localhost:3000/api/data
+content-type: application/json
+
+{
+    "command":"profile"
+}
+###
+POST http://localhost:3000/api/data
+content-type: application/json
+
+{
+    "command":"stats"
+}
