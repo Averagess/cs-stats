@@ -26,14 +26,15 @@ steamClient.on("connected", function() {
 steamClient.on("error", (err) => {
 	console.log(err);
 });
-
+steamClient.once("logOnResponse", function() {
+	steamFriends.setPersonaState(Steam.EPersonaState.Online);
+});
 steamClient.on("logOnResponse", function(res) {
 	if (res.eresult == Steam.EResult.OK) {
 		console.log("Succesful Login");
 	}
 	else {console.log("error", res);}
 	// to display your bot's status as "Online"
-	steamFriends.setPersonaState(Steam.EPersonaState.Online);
 	CSGO.launch();
 });
 
