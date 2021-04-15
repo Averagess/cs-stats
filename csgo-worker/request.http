@@ -18,3 +18,15 @@ content-type: application/json
 {
     "command":"stats"
 }
+###
+GET http://localhost:3000/api/getRank
+content-type: application/json
+
+{
+    "steamID":"76561198209407656"
+}
+
+###
+
+GET http://localhost:3000/api/getMatchmaking
+content-type: application/json
