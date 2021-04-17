@@ -21,3 +21,7 @@ TRN-Api-Key: 9b92c566-2aa5-4f1d-b4d4-eb0c12e0831e
 ### 
 
 GET https://steamcommunity.com/inventory/76561198116173009/440/2?l=english&count=5000
+
+
+### 
+GET http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=A46EE240150FDB461D92C711B23C66BF&steamid=76561198174141637
