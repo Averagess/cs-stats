@@ -58,7 +58,7 @@ module.exports = class statsCommand extends Command {
 				return rp(url3);
 			})
 			.then(response => {
-				const csgoData = response.account_profiles[0];
+				const csgoData = response;
 				const steamProfile = JSON.parse(url2.url1res).response.players[0];
 				const steamStats = JSON.parse(url2.url2res);
 				let kd = steamStats.playerstats.stats[0].value / steamStats.playerstats.stats[1].value;
@@ -72,13 +72,22 @@ module.exports = class statsCommand extends Command {
 						{ name: "Lifetime Kills", value:steamStats.playerstats.stats[0].value, inline: true },
 						{ name: "Lifetime Deaths", value:steamStats.playerstats.stats[1].value, inline: true },
 						{ name: "K/D", value:kd, inline: true },
-						{ name: "Real Playtime", value: Math.floor((steamStats.playerstats.stats[2].value / 60) / 60) + " hours" },
-						{ name: "Friendly", value: csgoData.commendation.cmd_friendly, inline: true },
-						{ name: "Teaching", value: csgoData.commendation.cmd_teaching, inline: true },
-						{ name: "Leader", value: csgoData.commendation.cmd_leader, inline: true },
 					)
 					.setTimestamp()
 					.setFooter("Ricksaw CSGO Bot");
+				if (csgoData.rankString) {
+					embedMessage.addFields(
+						{ name: "Friendly", value: csgoData.commendation.cmd_friendly, inline: true },
+						{ name: "Teaching", value: csgoData.commendation.cmd_teaching, inline: true },
+						{ name: "Leader", value: csgoData.commendation.cmd_leader, inline: true },
+						{ name: "Real Playtime", value: Math.floor((steamStats.playerstats.stats[2].value / 60) / 60) + " hours" },
+						{ name: "Rank", value: csgoData.rankString },
+					);
+				}
+				else {
+					embedMessage.addField("Real Playtime", Math.floor((steamStats.playerstats.stats[2].value / 60) / 60) + " hours");
+					embedMessage.addField("Rank", "if this is your account, see !cs updateRank");
+				}
 				rp.post({
 					uri:"http://localhost:3000/api/data",
 					json:{ "command":"stats" },
@@ -87,7 +96,8 @@ module.exports = class statsCommand extends Command {
 			})
 			.catch(err => {
 				if (err.statusCode == 500) {
-					return message.say("Steam API couldn't find the stats for the provided account. Double check your syntax and try again.");
+					console.log(err);
+					return message.say("This profile has set game details to private, To view the stats you need to set these details to public.");
 				}
 				console.log(err);
 			});
