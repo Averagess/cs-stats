@@ -2,6 +2,7 @@ const modules = require("./modules/modules.js");
 const dotenv = require("dotenv");
 const { CommandoClient } = require("discord.js-commando");
 const path = require("path");
+const rp = require("request-promise");
 dotenv.config();
 
 const client = new CommandoClient({
@@ -31,6 +32,12 @@ client.on("ready", () => {
 		.then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
 		.catch(console.error);
 
+});
+
+client.on("message", (msg) => {
+	if (msg.content.startsWith("!cs")) {
+		rp.post("http://localhost:3000/api/prefixCount");
+	}
 });
 
 client.login(process.env.DISCORDSECRET);
