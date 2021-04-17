@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const rp = require("request-promise");
 const { decToHex } = require("hex2dec");
 const { MessageEmbed } = require("discord.js");
+const m = require("../../modules/modules.js");
 dotenv.config();
 
 module.exports = class steamid extends Command {
@@ -44,6 +45,8 @@ module.exports = class steamid extends Command {
 		else {return message.say("Steam API couldn't find the provided account. Double check your syntax and try again.");}
 		const url1 = { uri: `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${things.apiKey}&steamids=${things.target}` };
 		rp(url1).then(res => {
+			const steamID1 = m.SteamIDConverter.toSteamID(things.target);
+			const steamID3 = m.SteamIDConverter.toSteamID3(things.target);
 			const hexid = decToHex(things.target).toUpperCase();
 			const profileData = JSON.parse(res).response.players[0];
 			const profileEmbed = new MessageEmbed()
@@ -52,6 +55,8 @@ module.exports = class steamid extends Command {
 				.setThumbnail(profileData.avatarmedium)
 				.addFields(
 					{ name: "Steam profile URL", value: profileData.profileurl },
+					{ name: "SteamID", value: steamID1 },
+					{ name: "SteamID3", value: steamID3 },
 					{ name: "Steam64 ID", value: things.target },
 					{ name: "Hex Id", value: hexid },
 				)
