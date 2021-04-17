@@ -21,7 +21,7 @@ module.exports = class mmstats extends Command {
 				const playersSearching = readableNumber(stats.players_searching);
 				const serversAvailable = readableNumber(stats.servers_available);
 				const ongoingMatches = readableNumber(stats.ongoing_matches);
-				const searchtimeAvg = readableNumber(stats.search_time_avg);
+				const searchtimeAvg = ((stats.search_time_avg / 60) / 1000).toFixed(2);
 				const statsEmbed = new MessageEmbed()
 					.setColor("#FFA500")
 					.setTitle("Current CS:GO Matchmaking stats")
@@ -32,7 +32,7 @@ module.exports = class mmstats extends Command {
 						{ name: "Players searching", value: playersSearching, inline:true },
 						{ name: "Servers available", value: serversAvailable, inline:true },
 						{ name: "Ongoing matches", value: ongoingMatches, inline:true },
-						{ name: "Search time average", value: searchtimeAvg, inline:true },
+						{ name: "Search time average", value: `${searchtimeAvg} minutes`, inline:true },
 					)
 					.setTimestamp()
 					.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
