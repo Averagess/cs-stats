@@ -44,5 +44,5 @@ Content-Type: application/json
     "rankString": "Gold Nova Master"
 }
 ###
-GET http://localhost:3000/api/updateFListData
+GET http://localhost:3000/api/updateFriendslist
 Content-Type: application/json
