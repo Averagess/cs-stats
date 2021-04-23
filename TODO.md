@@ -1,7 +1,7 @@
 ______________________________________
                 Ideas
     1. -GETOUT Command
-    2. -Rank updating protocol
+    2. 
     3. 
     4.
     5.
