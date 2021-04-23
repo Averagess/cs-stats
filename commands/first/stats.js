@@ -86,7 +86,7 @@ module.exports = class statsCommand extends Command {
 				}
 				else {
 					embedMessage.addField("Real Playtime", Math.floor((steamStats.playerstats.stats[2].value / 60) / 60) + " hours");
-					embedMessage.addField("Rank", "if this is your account, see !cs updateRank");
+					embedMessage.addField("Rank", "if this is your account, see !cs updaterank");
 				}
 				rp.post({
 					uri:"http://localhost:3000/api/data",
