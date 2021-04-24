@@ -36,8 +36,14 @@ client.on("ready", () => {
 
 client.on("message", (msg) => {
 	if (msg.content.startsWith("!cs")) {
-		rp.post("http://localhost:3000/api/prefixCount");
+		rp.post("http://localhost:3000/api/prefixCount")
+			.catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`));
 	}
 });
 
+process.on("SIGINT", function() {
+	console.log("Shutting down....");
+	client.destroy();
+	process.exit(0);
+});
 client.login(process.env.DISCORDSECRET);
