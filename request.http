@@ -24,4 +24,4 @@ GET https://steamcommunity.com/inventory/76561198116173009/440/2?l=english&count
 
 
 ### 
-GET http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=A46EE240150FDB461D92C711B23C66BF&steamid=76561198174141637
+GET http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=A46EE240150FDB461D92C711B23C66BF&steamid=76561198116173009
