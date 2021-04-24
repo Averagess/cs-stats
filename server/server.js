@@ -5,6 +5,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const rp = require("request-promise");
 const dotenv = require("dotenv");
+const fs = require("fs");
 const readline = require("readline");
 const moment = require("moment");
 const { waitFor } = require("wait-for-event");
@@ -21,15 +22,19 @@ const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
 });
+
 let logInTime;
 const Steam = require("steam"),
 	steamClient = new Steam.SteamClient(),
 	steamUser = new Steam.SteamUser(steamClient),
 	steamGC = new Steam.SteamGameCoordinator(steamClient, 730),
 	steamFriends = new Steam.SteamFriends(steamClient),
-
 	csgo = require("csgo"),
 	CSGO = new csgo.CSGOClient(steamUser, steamGC, true);
+
+if (fs.existsSync("steamServers.json")) {
+	Steam.servers = JSON.parse(fs.readFileSync("steamServers.json", "utf8"));
+}
 
 steamClient.connect();
 steamClient.on("connected", function() {
@@ -37,6 +42,14 @@ steamClient.on("connected", function() {
 		account_name: process.env.STEAMUSERNAME,
 		password: process.env.STEAMPASSWORD,
 		two_factor_code: process.argv[2],
+	});
+});
+
+steamClient.on("servers", (servers) => {
+	const stringArr = JSON.stringify(servers);
+	fs.writeFile("steamServers.json", stringArr, "utf-8", (err) => {
+		if (err) {console.log(err);}
+		else {console.log(`${time()} Updated steamServers list file.`);}
 	});
 });
 
@@ -95,6 +108,7 @@ steamFriends.on("friend", async (steamid, res) => {
 	console.log(res);
 	},
 );
+
 steamFriends.on("relationships", () => {
 	Object.keys(steamFriends.friends).forEach(key => {
 		if (steamFriends.friends[key] == 2) {
@@ -102,6 +116,52 @@ steamFriends.on("relationships", () => {
 			steamFriends.addFriend(key);
 		}
 	});
+});
+
+steamFriends.on("friendMsg", async (steamid, msg, type) => {
+	// If typing break out
+	if (type == 2) {
+		return;
+	}
+	if (type == 1 && msg == "!cs update") {
+		console.log(`${time()} Received an steamchat update request from steamid : ${steamid}`);
+		const profile = await rp("http://localhost:3000/api/fetchPlayerRank", { json: { steamid : steamid } });
+		const qString = `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=A46EE240150FDB461D92C711B23C66BF&steamids=${steamid}`;
+		const steamProfile = await rp(qString);
+		const obj = JSON.parse(steamProfile);
+		const steamPersonaName = obj.response.players[0].personaname;
+		const commendations = profile.account_profiles[0].commendation;
+		const mmRankId = profile.account_profiles[0].ranking.rank_id;
+		const mmWins = profile.account_profiles[0].ranking.wins;
+		const playerLevel = profile.account_profiles[0].player_level;
+		const playerCurExp = profile.account_profiles[0].player_cur_xp;
+		const mmRank = CSGO.Rank.getString(mmRankId);
+		const payload = {
+			"steamid64": steamid,
+			"steamPersonaName":steamPersonaName,
+			"rankString": mmRank,
+			"rankId":mmRankId,
+			"wins": mmWins,
+			"playerLevel":playerLevel,
+			"playerCurExp":playerCurExp,
+			"commendations":commendations,
+		};
+		rp.post("http://localhost:3000/api/testing", { json: payload })
+		.then(() => {
+			const message = "Your rank has been successfully updated!";
+			console.log(`${ time() } Successfully forwarded data to update for steamid ${steamid}`);
+			steamFriends.sendMessage(steamid, message);
+		})
+		.catch(err => {
+			const message = "Your rank wasnt updated. Try again later";
+			console.log(`${time()} Unsuccessful rank update!! ERR: ${err}`);
+			steamFriends.sendMessage(steamid, message);
+		});
+	return;
+	}
+	if (type == 1 && msg.startsWith("!cs")) {
+		steamFriends.sendMessage(steamid, "Unrecognized command.");
+	}
 });
 
 steamClient.on("error", (err) => {
@@ -176,31 +236,28 @@ app.post("/api/data", async (req, res) => {
 			const query = { "statsUsedCount": { $exists: true } };
 			await collection.updateOne(query,
 				{ $inc: { "statsUsedCount": 1 } },
-			);
+			).then(res.send("OK!")).catch(err => {console.log(err); res.status(500).send("Internal Server Error");});
 		}
 		else if (command === "profile") {
 			const query = { "profileUsedCount": { $exists: true } };
 			await collection.updateOne(query,
 				{ $inc: { "profileUsedCount": 1 } },
-			);
+			).then(res.send("OK!")).catch(err => {console.log(err); res.status(500).send("Internal Server Error");});
 		}
 		else if (command === "steamid") {
 			const query = { "steamidUsedCount": { $exists: true } };
 			await collection.updateOne(query,
 				{ $inc: { "steamidUsedCount": 1 } },
-			);
+			).then(res.send("OK!")).catch(err => {console.log(err); res.status(500).send("Internal Server Error");});
 		}
 		else if (command === "mm-stats") {
 			const query = { "mm-statsUsedCount": { $exists: true } };
 			await collection.updateOne(query,
 				{ $inc: { "mm-statsUsedCount": 1 } },
-			);
+			).then(res.send("OK!")).catch(err => {console.log(err); res.status(500).send("Internal Server Error");});
 		}
 	}
-	// finally {await mongoClient.close();}
-	// }
-	commandRan(req.body.command).catch(console.dir);
-	res.send("OK!");
+	commandRan(req.body.command);
 });
 
 app.get("/api/getRank", async (req, res) => {
