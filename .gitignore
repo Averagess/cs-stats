@@ -1,3 +1,5 @@
 node_modules
 package-lock.json
 csgo-worker/test.js
+.env
+server/.env
