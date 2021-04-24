@@ -2,6 +2,7 @@ const { Command } = require("discord.js-commando");
 const dotenv = require("dotenv");
 const { MessageEmbed } = require("discord.js");
 const rp = require("request-promise");
+const { readableNumber } = require("../../modules/modules.js");
 dotenv.config();
 
 module.exports = class statsCommand extends Command {
@@ -60,38 +61,44 @@ module.exports = class statsCommand extends Command {
 			.then(response => {
 				const csgoData = response;
 				const steamProfile = JSON.parse(url2.url1res).response.players[0];
-				const steamStats = JSON.parse(url2.url2res);
-				let kd = steamStats.playerstats.stats[0].value / steamStats.playerstats.stats[1].value;
+				const steamStats = JSON.parse(url2.url2res).playerstats.stats;
+				let kd = steamStats[0].value / steamStats[1].value;
 				kd = Math.round(Number(kd) * 100) / 100;
+				const totalShots = readableNumber(steamStats.find(value => value.name == "total_shots_fired").value);
+				const totalShotsHit = readableNumber(steamStats.find(value => value.name == "total_shots_hit").value);
+				const accuracy = Math.floor(parseInt(totalShotsHit.replace(/(\s)/g, "")) / parseInt(totalShots.replace(/(\s)/g, "")) * 100);
 				const embedMessage = new MessageEmbed()
 					.setTitle(steamProfile.personaname)
 					.setColor("#FFA500")
 					.setDescription("CS:GO Stats")
 					.setThumbnail(steamProfile.avatarfull)
 					.addFields(
-						{ name: "Lifetime Kills", value:steamStats.playerstats.stats[0].value, inline: true },
-						{ name: "Lifetime Deaths", value:steamStats.playerstats.stats[1].value, inline: true },
+						{ name: "Lifetime Kills", value:readableNumber(steamStats[0].value), inline: true },
+						{ name: "Lifetime Deaths", value:readableNumber(steamStats[1].value), inline: true },
 						{ name: "K/D", value:kd, inline: true },
+						{ name: "Total Shots Fired", value: totalShots, inline:true },
+						{ name: "Total Shots Hit", value: totalShotsHit, inline:true },
+						{ name: "Accuracy", value: `${accuracy} %`, inline:true },
 					)
 					.setTimestamp()
-					.setFooter("Ricksaw CSGO Bot");
+					.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
 				if (csgoData.rankString) {
 					embedMessage.addFields(
 						{ name: "Friendly", value: csgoData.commendation.cmd_friendly, inline: true },
 						{ name: "Teaching", value: csgoData.commendation.cmd_teaching, inline: true },
 						{ name: "Leader", value: csgoData.commendation.cmd_leader, inline: true },
-						{ name: "Real Playtime", value: Math.floor((steamStats.playerstats.stats[2].value / 60) / 60) + " hours" },
+						{ name: "Real Playtime", value: Math.floor((steamStats[2].value / 60) / 60) + " hours" },
 						{ name: "Rank", value: csgoData.rankString },
 					);
 				}
 				else {
-					embedMessage.addField("Real Playtime", Math.floor((steamStats.playerstats.stats[2].value / 60) / 60) + " hours");
+					embedMessage.addField("Real Playtime", Math.floor((steamStats[2].value / 60) / 60) + " hours");
 					embedMessage.addField("Rank", "if this is your account, see !cs updaterank");
 				}
 				rp.post({
 					uri:"http://localhost:3000/api/data",
 					json:{ "command":"stats" },
-				}).then(console.log("Succesful transaction with back end.")).catch(err => console.log(err));
+				}).catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`));
 				return message.say(embedMessage);
 			})
 			.catch(err => {
