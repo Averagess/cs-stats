@@ -89,7 +89,7 @@ module.exports = class profileCommand extends Command {
 				rp.post({
 					uri:"http://localhost:3000/api/data",
 					json:{ "command":"profile" },
-				}).then(console.log("Succesful transaction with back end.")).catch(console.log);
+				}).catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`));
 				return message.say(profileEmbed);
 				// If something went wrong
 				// throw new Error('messed up')
@@ -128,7 +128,7 @@ module.exports = class profileCommand extends Command {
 					rp.post({
 						uri:"http://localhost:3000/api/data",
 						json:{ "command":"profile" },
-					}).then(console.log("Succesful transaction with back end.")).catch(console.log);
+					}).catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`));
 					return message.say(profileEmbed);
 				}
 			});

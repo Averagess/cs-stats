@@ -67,7 +67,7 @@ module.exports = class steamid extends Command {
 			rp.post({
 				uri:"http://localhost:3000/api/data",
 				json:{ "command":"steamid" },
-			}).then(console.log("Succesful transaction with back end.")).catch(console.log),
+			}).catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`)),
 		);
 	}
 };
