@@ -12,6 +12,8 @@ const { waitFor } = require("wait-for-event");
 const { time } = require("../modules/modules");
 dotenv.config();
 
+
+process.env.TZ = "Europe/Helsinki";
 const app = express();
 
 const uri = process.env.MONGOURI;
@@ -124,6 +126,7 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 		return;
 	}
 	if (type == 1 && msg == "!cs update") {
+		await waitFor("ready", CSGO);
 		console.log(`${time()} Received an steamchat update request from steamid : ${steamid}`);
 		const profile = await rp("http://localhost:3000/api/fetchPlayerRank", { json: { steamid : steamid } });
 		const qString = `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=A46EE240150FDB461D92C711B23C66BF&steamids=${steamid}`;
