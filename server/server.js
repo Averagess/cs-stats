@@ -15,10 +15,10 @@ dotenv.config();
 
 process.env.TZ = "Europe/Helsinki";
 const app = express();
+app.use(bodyParser.json());
 
 const uri = process.env.MONGOURI;
 const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-app.use(bodyParser.json());
 const PORT = 3000;
 const rl = readline.createInterface({
 	input: process.stdin,
@@ -282,7 +282,26 @@ app.get("/api/getRank", async (req, res) => {
 		res.status(200).send(find);
 	}
 });
-
+app.post("/api/blacklistUser", async (req, res) => {
+	if (!req.body) {
+		return res.status(400).send("Request body was empty");
+	}
+	fs.readFile("blacklist.json", (err, data) => {
+		if (err) {
+			return console.log(`${time()} error while reading blacklist.json at /api/blacklistUser`);
+		}
+		const arr = JSON.parse(data);
+		if (arr.includes(req.body.userID)) {
+			return res.status(304).send("User is already blacklisted");
+		}
+		else {
+			arr.push(req.body.userID);
+			fs.writeFile("blacklist.json", JSON.stringify(arr), () => {
+				return res.status(200).send("User blacklisted");
+			});
+		}
+	});
+});
 app.post("/api/testing", async (req, res) => {
 	console.log(`${ time() } PlayerDB request received!`);
 	const database = mongoClient.db("DiscordData");
