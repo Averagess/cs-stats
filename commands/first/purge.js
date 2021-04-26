@@ -27,7 +27,7 @@ module.exports = class purgeCommand extends Command {
 		}
 		const oldMessage = message;
 		message.channel.messages.delete(message).then(() => {
-			oldMessage.channel.messages.fetch({ limit: parseInt(amount) }).then(msg => {
+			oldMessage.channel.messages.fetch({ limit: amount }).then(msg => {
 				// msg.forEach(item => console.log(item.content));
 				oldMessage.channel.bulkDelete(msg)
 					.then(deletedMessages => {
