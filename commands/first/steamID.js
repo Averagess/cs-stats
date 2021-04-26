@@ -58,7 +58,7 @@ module.exports = class steamid extends Command {
 					{ name: "SteamID", value: steamID1 },
 					{ name: "SteamID3", value: steamID3 },
 					{ name: "Steam64 ID", value: things.target },
-					{ name: "Hex Id", value: hexid },
+					{ name: "Hex ID", value: hexid },
 				)
 				.setTimestamp()
 				.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
