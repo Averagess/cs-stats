@@ -3,12 +3,23 @@ const dotenv = require("dotenv");
 const { CommandoClient } = require("discord.js-commando");
 const path = require("path");
 const rp = require("request-promise");
+const fs = require("fs");
 dotenv.config();
+let blacklist;
+
+if (fs.existsSync("server/blacklist.json", "utf-8")) {
+	blacklist = JSON.parse(fs.readFileSync("server/blacklist.json"));
+}
+else {console.log(`${modules.time()} [WARN] didnt load user blacklist since it doesnt exist.`);}
+fs.watchFile("server/blacklist.json", () => {
+	blacklist = JSON.parse(fs.readFileSync("server/blacklist.json"));
+	console.log(`${modules.time()} Updated blacklist`);
+});
 
 const client = new CommandoClient({
 	commandPrefix: "!cs",
 	owner: "184366854674972672",
-	invite: "https://discord.gg/muHq8gmBwU",
+	invite: "https://discord.gg/Brs96NUFs8",
 	disableEveryone: true,
 	unknownCommandResponse: false,
 });
@@ -16,6 +27,7 @@ client.dispatcher
 	.addInhibitor(msg => {
 		// Under work..
 		// if (msg.author.id == client.options.owner) return "blacklisted";
+		if (blacklist.includes(msg.author.id)) return { reason: "blacklisted", response : msg.reply("You have been blacklisted. You can appeal here: https://discord.gg/Brs96NUFs8") };
 	});
 client.registry
 	.registerDefaultTypes()
