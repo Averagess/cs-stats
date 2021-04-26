@@ -28,7 +28,7 @@ module.exports = class blacklistCommand extends Command {
 				if (err.statusCode == 304) {
 					return message.say(`${mention} was already blacklisted.`);
 				}
-				else if (err.statusCod == 400) {
+				else if (err.statusCode == 400) {
 					return message.reply(`Bot's request body was empty when blacklisting user ${mention}`);
 				}
 				console.log(`error while blacklisting, err: ${err}`);
