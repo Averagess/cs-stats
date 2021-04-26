@@ -12,7 +12,7 @@ module.exports = class purgeCommand extends Command {
 				{
 					key:"amount",
 					prompt:"Number of messages to purge",
-					type: "string",
+					type: "integer",
 				},
 			],
 		});
@@ -32,13 +32,11 @@ module.exports = class purgeCommand extends Command {
 				oldMessage.channel.bulkDelete(msg)
 					.then(deletedMessages => {
 						if (deletedMessages.size == 1) {
-							return oldMessage.say(`Deleted ${amount} message`);
+							return oldMessage.say(`Deleted ${deletedMessages.size} message`);
 						}
 						return oldMessage.say(`Deleted ${deletedMessages.size} messages`);
 					});
 			});
 		});
-
-		// return message.say(`${amount}`);
 	}
 };
