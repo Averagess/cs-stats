@@ -11,7 +11,7 @@ module.exports = class feedbackCommand extends Command {
 			args: [
 				{
 					key:"text",
-					prompt:"Feedback that you submit",
+					prompt:"Feedback that you want to submit",
 					type: "string",
 				},
 			],
