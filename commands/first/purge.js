@@ -7,6 +7,7 @@ module.exports = class purgeCommand extends Command {
 			group: "first",
 			memberName: "purge",
 			description: "Purges messages",
+			ownerOnly: true,
 			args: [
 				{
 					key:"amount",
