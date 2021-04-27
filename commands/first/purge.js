@@ -6,8 +6,9 @@ module.exports = class purgeCommand extends Command {
 			name: "purge",
 			group: "first",
 			memberName: "purge",
-			description: "Purges messages",
+			description: "Purges messages, only executable by the bot owner.",
 			ownerOnly: true,
+			hidden: true,
 			args: [
 				{
 					key:"amount",

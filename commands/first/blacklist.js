@@ -9,6 +9,11 @@ module.exports = class blacklistCommand extends Command {
 			memberName: "blacklist",
 			description: "Blacklists an user. Only executable by the bot owner.",
 			ownerOnly: true,
+			hidden: true,
+			throttling: {
+				usages: 2,
+				duration: 10,
+			},
 			args: [
 				{
 					key: "mention",

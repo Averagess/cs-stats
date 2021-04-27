@@ -13,6 +13,10 @@ module.exports = class steamid extends Command {
 			group: "first",
 			memberName: "steamid",
 			description: "Replies with a steamid for the provided account",
+			throttling: {
+				usages: 2,
+				duration: 10,
+			},
 			args: [
 				{
 					key: "text",

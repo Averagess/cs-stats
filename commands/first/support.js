@@ -7,6 +7,10 @@ module.exports = class supportCommand extends Command {
 			group: "first",
 			memberName: "support",
 			description: "Replies with a invite link to the support / community server.",
+			throttling: {
+				usages: 2,
+				duration: 10,
+			},
 		});
 	}
 

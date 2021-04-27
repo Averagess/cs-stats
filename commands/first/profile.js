@@ -14,6 +14,10 @@ module.exports = class profileCommand extends Command {
 			group: "first",
 			memberName: "profile",
 			description: "Replies with info about submitted steam profile.",
+			throttling: {
+				usages: 2,
+				duration: 10,
+			},
 			args: [
 				{
 					key: "text",

@@ -9,6 +9,10 @@ module.exports = class mmstats extends Command {
 			group: "first",
 			memberName: "matchmaking",
 			description: "Replies with current CS:GO Matchmaking stats",
+			throttling: {
+				usages: 2,
+				duration: 10,
+			},
 		});
 	}
 

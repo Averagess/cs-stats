@@ -7,6 +7,10 @@ module.exports = class helpCommand extends Command {
 			group: "first",
 			memberName: "help",
 			description: "Replies with a list of available commands.",
+			throttling: {
+				usages: 2,
+				duration: 10,
+			},
 		});
 	}
 

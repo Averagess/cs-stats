@@ -1,5 +1,5 @@
-const { Command } = require("discord.js-commando");
 const dotenv = require("dotenv");
+const { Command } = require("discord.js-commando");
 const { MessageEmbed } = require("discord.js");
 const rp = require("request-promise");
 const { readableNumber } = require("../../modules/modules.js");

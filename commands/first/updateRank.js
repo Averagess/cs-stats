@@ -7,6 +7,10 @@ module.exports = class updaterank extends Command {
 			group: "first",
 			memberName: "updaterank",
 			description: "Replies with instructions on how to update your rank",
+			throttling: {
+				usages: 2,
+				duration: 10,
+			},
 		});
 	}
 

@@ -7,6 +7,10 @@ module.exports = class MeowCommand extends Command {
 			group: "first",
 			memberName: "meow",
 			description: "Replies with a meow, kitty cat.",
+			throttling: {
+				usages: 2,
+				duration: 10,
+			},
 		});
 	}
 
