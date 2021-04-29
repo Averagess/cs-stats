@@ -32,10 +32,10 @@ module.exports = class feedbackCommand extends Command {
 		const feedbackEmbed = new MessageEmbed()
 			.setColor("#FFA500")
 			.setThumbnail(message.author.displayAvatarURL())
-			.setTitle(`${message.author.tag}'s feedback, <${message.author.id}>`)
+			.setTitle(`${message.author.tag}'s feedback`)
 			.setDescription(text)
 			.setTimestamp()
-			.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
+			.setFooter(`Ricksaw CSGO Bot, author's id: ${message.author.id}`, this.client.user.displayAvatarURL());
 		this.client.channels.fetch(feedbackTextChannel).then(channel => {
 			channel.send(feedbackEmbed)
 				.then((feedbackMessage) => {
