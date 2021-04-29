@@ -13,6 +13,8 @@ module.exports = class steamid extends Command {
 			group: "first",
 			memberName: "steamid",
 			description: "Replies with a steamid for the provided account",
+			argsPromptLimit: 0,
+			format: "<steamcommunity link> / <steamid64>",
 			throttling: {
 				usages: 2,
 				duration: 10,
@@ -20,7 +22,7 @@ module.exports = class steamid extends Command {
 			args: [
 				{
 					key: "text",
-					prompt: "Steam profile link",
+					prompt: "steam profile link",
 					type: "string",
 				},
 			],

@@ -9,10 +9,11 @@ module.exports = class purgeCommand extends Command {
 			description: "Purges messages, only executable by the bot owner.",
 			ownerOnly: true,
 			hidden: true,
+			argsPromptLimit: 0,
 			args: [
 				{
 					key:"amount",
-					prompt:"Number of messages to purge",
+					prompt:"number of messages to purge",
 					type: "integer",
 				},
 			],

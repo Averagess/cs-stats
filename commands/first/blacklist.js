@@ -10,6 +10,7 @@ module.exports = class blacklistCommand extends Command {
 			description: "Blacklists an user. Only executable by the bot owner.",
 			ownerOnly: true,
 			hidden: true,
+			argsPromptLimit: 0,
 			throttling: {
 				usages: 2,
 				duration: 10,
@@ -17,7 +18,7 @@ module.exports = class blacklistCommand extends Command {
 			args: [
 				{
 					key: "mention",
-					prompt : "Mention or Discord user ID",
+					prompt : "mention or Discord user ID",
 					type : "user",
 				},
 			],

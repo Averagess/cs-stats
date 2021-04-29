@@ -14,6 +14,8 @@ module.exports = class profileCommand extends Command {
 			group: "first",
 			memberName: "profile",
 			description: "Replies with info about submitted steam profile.",
+			format: "<steamcommunity link> / <steamid64>",
+			argsPromptLimit: 0,
 			throttling: {
 				usages: 2,
 				duration: 10,
@@ -21,7 +23,7 @@ module.exports = class profileCommand extends Command {
 			args: [
 				{
 					key: "text",
-					prompt: "Steam profile link",
+					prompt: "steam profile link",
 					type: "string",
 				},
 			],

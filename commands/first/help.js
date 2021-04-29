@@ -7,6 +7,8 @@ module.exports = class helpCommand extends Command {
 			group: "first",
 			memberName: "help",
 			description: "Replies with a list of available commands.",
+			hidden: true,
+			argsPromptLimit: 0,
 			throttling: {
 				usages: 2,
 				duration: 10,
@@ -15,22 +17,33 @@ module.exports = class helpCommand extends Command {
 	}
 
 	run(message) {
-		const messageEmbed = new MessageEmbed()
+		const commands = this.client.registry.findCommands("", false, message);
+		const cmds = [];
+		commands.forEach(item => {
+			if (item.group.id == "first" && item.hidden == false) {
+				cmds.push(item);
+			}
+		});
+		const helpEmbed = new MessageEmbed()
 			.setColor("#FFA500")
 			.setTitle("Commands")
 			.setThumbnail("https://i.pinimg.com/originals/b1/02/24/b10224ae75edd5debd06c44662cbcb30.png")
-			.addFields(
-				{ name: "!cs mm-stats", value: "Shows current data about CS:GO Matchmaking servers" },
-				{ name: "!cs profile <steam profile>", value: "Shows data about a steam profile" },
-				{ name: "!cs stats <steam profile>", value: "Shows data about a players CS:GO stats" },
-				{ name: "!cs steamid <steam profile>", value: "Shows a list of a steam profiles available id's" },
-				{ name: "!cs updaterank", value: "Gives info how to update your own matchmaking rank" },
-				{ name: "!cs support", value:"Ricksaw's support / community server" },
-				{ name: "!cs feedback <message>", value:"Submit feedback about the bot, or make suggestions" },
-				{ name: "!cs help", value:"Lists all available commands" },
-			)
 			.setTimestamp()
 			.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
-		return message.say(messageEmbed);
+		cmds.forEach(item => {
+			// const possibleArgs = item.argsCollector.args[0].prompt;
+			if (item.argsCollector !== null) {
+				const arg = item.argsCollector.args[0];
+				const name = item.name;
+				const desc = item.description;
+				helpEmbed.addField(`!cs ${name} <${arg.prompt}>`, `${desc}`);
+			}
+			else {
+				const name = item.name;
+				const desc = item.description;
+				helpEmbed.addField(`!cs ${name}`, desc);
+			}
+		});
+		return message.say(helpEmbed);
 	}
 };

@@ -12,10 +12,12 @@ module.exports = class statsCommand extends Command {
 			group: "first",
 			memberName: "stats",
 			description: "Replies with a set of CS:GO stats.",
+			argsPromptLimit: 0,
+			format: "<steamcommunity link> / <steamid64>",
 			args: [
 				{
 					key: "text",
-					prompt: "Steam profile link",
+					prompt: "steam profile link",
 					type: "string",
 				},
 			],
