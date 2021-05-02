@@ -126,7 +126,6 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 		return;
 	}
 	if (type == 1 && msg == "!cs update") {
-		await waitFor("ready", CSGO);
 		console.log(`${time()} Received an steamchat update request from steamid : ${steamid}`);
 		const profile = await rp("http://localhost:3000/api/fetchPlayerRank", { json: { steamid : steamid } });
 		const qString = `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=A46EE240150FDB461D92C711B23C66BF&steamids=${steamid}`;
@@ -169,7 +168,13 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 
 steamClient.on("error", (err) => {
 	console.log(`${time()} ${err}`);
-	process.exit(0);
+	try {
+		console.log(`${time()} Attempting reconnecting..`);
+		steamClient.connect();
+	}
+	catch (error) {
+		console.log(`${time()} Couldnt Connect.. err: ${error}`);
+	}
 });
 
 steamClient.on("logOnResponse", function(res) {
@@ -181,19 +186,20 @@ steamClient.on("logOnResponse", function(res) {
 	}
 	else if (res.eresult == Steam.EResult.InvalidPassword) {
 		console.log(`${time()} ERR: Invalid Password`);
-		return;
+		throw new Error("ERR: Invalid Password");
 	}
 	else if (res.eresult == Steam.EResult.TwoFactorCodeMismatch) {
 		console.log(`${time()} ERR: Invalid Two Factor Code`);
-		return;
+		throw new Error("ERR: Invalid Two Factor Code");
 	}
 	else if (res.eresult == Steam.EResult.LoggedInElsewhere) {
 		console.log(`${time()} ERR: Bot Account logged in elsewhere`);
-		return;
+		throw new Error("ERR: Bot Account logged in elsewhere");
 	}
 	else if (res.eresult == Steam.EResult.AccountLoginDeniedNeedTwoFactor) {
 		console.log(`${time()} ERR: No Two Factor Code, Please provide the code.`);
-		return;
+		throw new Error("ERR: No Two Factor Code");
+
 	}
 	else {console.log(`ERR: ${res.eresult} Check: https://github.com/SteamRE/SteamKit/blob/master/Resources/SteamLanguage/eresult.steamd#L96`); return;}
 	// to display your bot's status as "Online"
