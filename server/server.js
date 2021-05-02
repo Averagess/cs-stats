@@ -14,15 +14,19 @@ const { time } = require("../modules/modules");
 const { combine, timestamp, printf, prettyPrint, metadata, colorize } = winston.format;
 dotenv.config();
 
-process.env.TZ = "Europe/Helsinki";
 const app = express();
 app.use(bodyParser.json());
 
+const timezoned = () => {
+    return new Date().toLocaleString("en-US", {
+        timeZone: "Europe/Helsinki",
+    });
+};
 
 const logFormat = printf(info => `[${info.timestamp}] [${info.level}] ${info.message}`);
 const logger = winston.createLogger({
 	format: combine(
-		timestamp(),
+		timestamp({ format : timezoned }),
 		prettyPrint(),
 		metadata({ fillExcept: ["message", "level", "timestamp"] }),
 	),
