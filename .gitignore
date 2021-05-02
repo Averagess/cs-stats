@@ -3,3 +3,5 @@ package-lock.json
 csgo-worker/test.js
 server/.env
 .env
+server/server-logs.log
+server/steamServers.json
