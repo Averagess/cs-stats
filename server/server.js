@@ -33,7 +33,7 @@ const logger = winston.createLogger({
 			logFormat,
 		),
 	}),
-	new winston.transports.File({ filename: "combined.log" }),
+	new winston.transports.File({ filename: "server-logs.log" }),
 	],
   });
 
