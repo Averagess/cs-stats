@@ -17,7 +17,7 @@ const app = express();
 app.use(bodyParser.json());
 
 const timezoned = () => {
-    return new Date().toLocaleString("en-US", {
+    return new Date().toLocaleString("en-GB", {
         timeZone: "Europe/Helsinki",
     });
 };
