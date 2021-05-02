@@ -10,7 +10,6 @@ const readline = require("readline");
 const winston = require ("winston");
 const moment = require("moment");
 const { waitFor } = require("wait-for-event");
-const { time } = require("../modules/modules");
 const { combine, timestamp, printf, prettyPrint, metadata, colorize } = winston.format;
 dotenv.config();
 
@@ -78,7 +77,6 @@ steamClient.on("servers", (servers) => {
 			logger.error(err);
 		}
 		else {
-			// logger.log({ level: "info", message: `${time()} Updated steamServers list file.` });
 			logger.info("Updated steamServers list file.");
 }
 	});
@@ -198,7 +196,7 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 });
 
 steamClient.on("error", (err) => {
-	console.log(`${time()} ${err}`);
+	logger.error(err);
 	try {
 		logger.info("Attempting reconnecting..");
 		steamClient.connect();
@@ -473,11 +471,11 @@ rl.on("line", (input) => {
 		logger.info(`Uptime: ${Math.floor(difference)} minutes`);
 	}
 	else {
-		logger.info(`${time()} INPUT ERR: Unknown Command: ["${input}"]`);
+		logger.info(`INPUT ERR: Unknown Command: ["${input}"]`);
 	}
 });
 process.on("SIGINT", function() {
-	logger.info(`${time()} Shutting down....`);
+	logger.info("Shutting down....");
 	mongoClient.close(function() {
 		const currentTime = moment().unix();
 		logger.info("MongoDB disconnected on app termination");
