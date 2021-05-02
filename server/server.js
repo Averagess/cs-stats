@@ -11,6 +11,7 @@ const winston = require ("winston");
 const moment = require("moment");
 const { waitFor } = require("wait-for-event");
 const { combine, timestamp, printf, prettyPrint, metadata, colorize } = winston.format;
+const { reconnStr } = require("../modules/modules");
 dotenv.config();
 
 const app = express();
@@ -48,7 +49,9 @@ const rl = readline.createInterface({
 	output: process.stdout,
 });
 
-let logInTime;
+const startupTime = moment().unix();
+let reconnections = 0;
+
 const Steam = require("steam"),
 	steamClient = new Steam.SteamClient(),
 	steamUser = new Steam.SteamUser(steamClient),
@@ -211,7 +214,7 @@ steamClient.on("logOnResponse", function(res) {
 		logger.info("Successful steam login");
 		mongoClient.connect().then(logger.info("Successfully connected to DB!")).catch(reason => logger.error(`MongoDB ERROR: ${reason}`));
 		CSGO.launch();
-		logInTime = moment().unix();
+		reconnections++;
 	}
 	else if (res.eresult == Steam.EResult.InvalidPassword) {
 		logger.error("Invalid Steam Password on login");
@@ -467,8 +470,8 @@ app.get("/api/getMatchData", (req, res) => {
 rl.on("line", (input) => {
 	if (input == "uptime") {
 		const currentTime = moment().unix();
-		const difference = (currentTime - logInTime) / 60;
-		logger.info(`Uptime: ${Math.floor(difference)} minutes`);
+		const difference = (currentTime - startupTime) / 60;
+		logger.info(`Uptime: ${Math.floor(difference)} minutes, ${reconnStr(reconnections)}`);
 	}
 	else {
 		logger.info(`INPUT ERR: Unknown Command: ["${input}"]`);
@@ -481,7 +484,7 @@ process.on("SIGINT", function() {
 		logger.info("MongoDB disconnected on app termination");
 		CSGO.exit(logger.info("CS:GO disconnected on app termination"));
 		steamClient.disconnect(logger.info("Steam disconnected on app termination"));
-		logger.info(`Server uptime was: ${Math.floor((currentTime - logInTime) / 60)} minutes.`);
+		logger.info(`Server uptime was: ${Math.floor((currentTime - startupTime) / 60)} minutes and there we're total of ${reconnStr(reconnections)}`);
 		process.exit(0);
 	});
 });
