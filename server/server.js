@@ -484,7 +484,7 @@ process.on("SIGINT", function() {
 		logger.info("MongoDB disconnected on app termination");
 		CSGO.exit(logger.info("CS:GO disconnected on app termination"));
 		steamClient.disconnect(logger.info("Steam disconnected on app termination"));
-		logger.info(`Server uptime was: ${Math.floor((currentTime - startupTime) / 60)} minutes and there we're total of ${reconnStr(reconnections)}`);
+		logger.info(`Server uptime was: ${Math.floor((currentTime - startupTime) / 60)} minutes and there were a total of ${reconnStr(reconnections)}`);
 		process.exit(0);
 	});
 });
