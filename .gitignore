@@ -5,5 +5,5 @@ server/.env
 .env
 server/server-logs.log
 server/steamServers.json
-discord-bot.log
 server-logs.log
+bot-logs.log
