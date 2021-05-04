@@ -3,35 +3,9 @@ const { CommandoClient } = require("discord.js-commando");
 const path = require("path");
 const rp = require("request-promise");
 const fs = require("fs");
-const winston = require("winston");
-const { combine, timestamp, printf, prettyPrint, metadata, colorize } = winston.format;
+const logger = require("./modules/logger.js");
 dotenv.config();
 let blacklist;
-
-const timezoned = () => {
-	return new Date().toLocaleString("en-GB", {
-		timeZone: "Europe/Helsinki",
-	});
-};
-
-const logFormat = printf(info => `[${info.timestamp}] [${info.level}] ${info.message}`);
-const logger = winston.createLogger({
-	format: combine(
-		timestamp({ format : timezoned }),
-		prettyPrint(),
-		metadata({ fillExcept: ["message", "level", "timestamp"] }),
-	),
-	transports: [
-		new winston.transports.Console({
-			format: combine(
-				colorize(),
-				logFormat),
-			handleRejections: true,
-			// handleExceptions: true,
-		}),
-		new winston.transports.File({ filename: "discord-bot.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
-	],
-});
 
 if (fs.existsSync("server/blacklist.json", "utf-8")) {
 	blacklist = JSON.parse(fs.readFileSync("server/blacklist.json"));
