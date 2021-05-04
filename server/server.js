@@ -31,14 +31,15 @@ const logger = winston.createLogger({
 		metadata({ fillExcept: ["message", "level", "timestamp"] }),
 	),
 	transports: [
-	new winston.transports.Console({
-		format: combine(
-			colorize(),
-			logFormat,
-		),
-	}),
-	new winston.transports.File({ filename: "server-logs.log" }),
-	],
+		new winston.transports.Console({
+			format: combine(
+				colorize(),
+				logFormat),
+			handleRejections: true,
+			// handleExceptions: true,
+		}),
+		new winston.transports.File({ filename: "server-logs.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
+		],
   });
 
 const uri = process.env.MONGOURI;
@@ -69,7 +70,7 @@ steamClient.on("connected", function() {
 	steamUser.logOn({
 		account_name: process.env.STEAMUSERNAME,
 		password: process.env.STEAMPASSWORD,
-		two_factor_code: process.argv[2],
+		// two_factor_code: process.argv[2],
 	});
 });
 
@@ -216,26 +217,16 @@ steamClient.on("logOnResponse", function(res) {
 		CSGO.launch();
 		reconnections++;
 	}
-	else if (res.eresult == Steam.EResult.InvalidPassword) {
-		logger.error("Invalid Steam Password on login");
-		throw new Error("ERR: Invalid Password");
+	else {
+		Object.keys(Steam.EResult).forEach((key, value) => {
+			if (value == res.eresult) {
+				logger.error(`Error raised while signing to steam. err: ${key}`);
+				logger.info("Shutting Down..");
+				steamClient.disconnect();
+				process.exit();
+			}
+		});
 	}
-	else if (res.eresult == Steam.EResult.TwoFactorCodeMismatch) {
-		logger.error("Invalid Two Factor Code");
-		throw new Error("ERR: Invalid Two Factor Code");
-	}
-	else if (res.eresult == Steam.EResult.LoggedInElsewhere) {
-		logger.error("Bot Account logged in elsewhere");
-		throw new Error("ERR: Bot Account logged in elsewhere");
-	}
-	else if (res.eresult == Steam.EResult.AccountLoginDeniedNeedTwoFactor) {
-		logger.error("No Two Factor Code");
-		throw new Error("ERR: No Two Factor Code");
-
-	}
-	else {logger.error(`EResult: ${res.eresult} Check: https://github.com/SteamRE/SteamKit/blob/master/Resources/SteamLanguage/eresult.steamd#L96`); return;}
-	// to display your bot's status as "Online"
-	// steamFriends.setPersonaState(Steam.EPersonaState.Online);
 });
 
 CSGO.on("ready", function onReady() {
