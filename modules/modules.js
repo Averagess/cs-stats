@@ -128,7 +128,7 @@ module.exports = {
 	},
 	reconnStr: (count) => {
 		if (count == 1) {
-			return `${count} connection`;
+			return "no reconnections";
 		}
 		else {
 			return `${count} reconnections`;
