@@ -29,7 +29,7 @@ module.exports = class blacklistCommand extends Command {
 	run(message, { mention }) {
 		rp.post("http://localhost:3000/api/blacklistUser", { json: { userID: mention.id } })
 			.then(() => {
-				return message.say(`${mention} Blacklisted successfully.`);
+				return message.say(`${mention} blacklisted successfully.`);
 			})
 			.catch(err => {
 				if (err.statusCode == 304) {
@@ -38,7 +38,7 @@ module.exports = class blacklistCommand extends Command {
 				else if (err.statusCode == 400) {
 					return message.reply(`Bot's request body was empty when blacklisting user ${mention}`);
 				}
-				logger.error(`Error while blacklisting, err: ${err}`);
+				logger.error(`Error while blacklisting user ${mention}, err: ${err}`);
 				return message.reply(`Error while blacklisting user ${mention}`);
 			});
 	}
