@@ -38,12 +38,11 @@ const logger = winston.createLogger({
 			handleRejections: true,
 			// handleExceptions: true,
 		}),
-		new winston.transports.File({ filename: "server-logs.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
+		new winston.transports.File({ filename: "../logs/server-logs.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
 		],
   });
 
-const uri = process.env.MONGOURI;
-const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const mongoClient = new MongoClient(process.env.MONGOURI, { useNewUrlParser: true, useUnifiedTopology: true });
 const PORT = 3000;
 const rl = readline.createInterface({
 	input: process.stdin,
@@ -64,6 +63,9 @@ const Steam = require("steam"),
 if (fs.existsSync("steamServers.json")) {
 	Steam.servers = JSON.parse(fs.readFileSync("steamServers.json", "utf8"));
 }
+else {
+	logger.info("No steamServers.json file. Loading default servers.");
+}
 
 steamClient.connect();
 steamClient.on("connected", function() {
@@ -82,7 +84,7 @@ steamClient.on("servers", (servers) => {
 		}
 		else {
 			logger.info("Updated steamServers list file.");
-}
+		}
 	});
 });
 
@@ -140,9 +142,7 @@ steamFriends.on("friend", async (steamid, res) => {
 		logger.info(`${steamid} removed me from friends`);
 		return;
 	}
-	console.log(res);
-	},
-);
+});
 
 steamFriends.on("relationships", () => {
 	Object.keys(steamFriends.friends).forEach(key => {
@@ -206,7 +206,7 @@ steamClient.on("error", (err) => {
 		steamClient.connect();
 	}
 	catch (error) {
-		logger.info(`Couldnt Connect.. err: ${error}`);
+		logger.error(`Couldnt Connect.. err: ${error}`);
 	}
 });
 
@@ -259,9 +259,6 @@ app.post("/api/data", async (req, res) => {
 		});
 	}
 	async function commandRan(command) {
-		// try {
-		// await mongoClient.connect();
-		// const options = { upsert : true };
 		const database = mongoClient.db("DiscordData");
 		const collection = database.collection("discord");
 		if (command === "stats") {
@@ -299,18 +296,18 @@ app.get("/api/getRank", async (req, res) => {
 	else if (!req.body.steamID) {
 		return res.status(500).send("Invalid Request");
 	}
-	// REQ BODY steamID
 	const database = mongoClient.db("DiscordData");
 	const collection = database.collection("ranks");
 	const query = { "steamid64": req.body.steamID };
 	const find = await collection.findOne(query);
 	if (find == null) {
-		res.status(200).send("No stats for were found for this account");
+		res.status(200).send("No stats were found for this account");
 	}
 	else {
 		res.status(200).send(find);
 	}
 });
+
 app.post("/api/blacklistUser", async (req, res) => {
 	if (!req.body) {
 		return res.status(400).send("Request body was empty");
@@ -331,6 +328,7 @@ app.post("/api/blacklistUser", async (req, res) => {
 		}
 	});
 });
+
 app.post("/api/testing", async (req, res) => {
 	logger.info("PlayerDB request received!");
 	const database = mongoClient.db("DiscordData");
@@ -391,7 +389,7 @@ app.get("/api/getMatchmaking", (req, res) => {
 });
 
 app.get("/api/updateFriendslist", (req, res) => {
-	res.send("OK");
+	res.status(200).send("OK");
 	const interval = 4000;
 	let promise = Promise.resolve();
 	Object.keys(steamFriends.friends).forEach(key => {
@@ -457,7 +455,6 @@ app.get("/api/getMatchData", (req, res) => {
 	});
 });
 
-
 rl.on("line", (input) => {
 	if (input == "uptime") {
 		const currentTime = moment().unix();
@@ -468,6 +465,7 @@ rl.on("line", (input) => {
 		logger.info(`INPUT ERR: Unknown Command: ["${input}"]`);
 	}
 });
+
 process.on("SIGINT", function() {
 	logger.info("Shutting down....");
 	mongoClient.close(function() {
