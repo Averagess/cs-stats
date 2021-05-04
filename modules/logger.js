@@ -23,7 +23,7 @@ const logger = winston.createLogger({
 			handleRejections: true,
 			// handleExceptions: true,
 		}),
-		new winston.transports.File({ filename: "../discord-bot.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
+		new winston.transports.File({ filename: "bot-logs.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
 	],
 });
 
