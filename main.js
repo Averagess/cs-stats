@@ -1,19 +1,45 @@
-const modules = require("./modules/modules.js");
 const dotenv = require("dotenv");
 const { CommandoClient } = require("discord.js-commando");
 const path = require("path");
 const rp = require("request-promise");
 const fs = require("fs");
+const winston = require("winston");
+const { combine, timestamp, printf, prettyPrint, metadata, colorize } = winston.format;
 dotenv.config();
 let blacklist;
+
+const timezoned = () => {
+	return new Date().toLocaleString("en-GB", {
+		timeZone: "Europe/Helsinki",
+	});
+};
+
+const logFormat = printf(info => `[${info.timestamp}] [${info.level}] ${info.message}`);
+const logger = winston.createLogger({
+	format: combine(
+		timestamp({ format : timezoned }),
+		prettyPrint(),
+		metadata({ fillExcept: ["message", "level", "timestamp"] }),
+	),
+	transports: [
+		new winston.transports.Console({
+			format: combine(
+				colorize(),
+				logFormat),
+			handleRejections: true,
+			// handleExceptions: true,
+		}),
+		new winston.transports.File({ filename: "discord-bot.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
+	],
+});
 
 if (fs.existsSync("server/blacklist.json", "utf-8")) {
 	blacklist = JSON.parse(fs.readFileSync("server/blacklist.json"));
 }
-else {console.log(`${modules.time()} [WARN] didnt load user blacklist since it doesnt exist.`);}
+else {logger.warn("Didnt load user blacklist since it doesnt exist.");}
 fs.watchFile("server/blacklist.json", () => {
 	blacklist = JSON.parse(fs.readFileSync("server/blacklist.json"));
-	console.log(`${modules.time()} Updated blacklist`);
+	logger.info("Updated blacklist");
 });
 
 const client = new CommandoClient({
@@ -43,10 +69,10 @@ client.registry
 	.registerCommandsIn(path.join(__dirname, "commands"));
 
 client.on("ready", () => {
-	console.log(`${modules.time()} Ready. Connected as: [${client.user.tag}]`);
+	logger.info(`Ready. Connected as: [${client.user.tag}]`);
 	client.user.setActivity(" : !cs", { type: "LISTENING" })
-		.then(presence => console.log(`${modules.time()} Activity set to ${presence.activities[0].name}`))
-		.catch(console.error);
+		.then(presence => logger.info(`Activity set to ${presence.activities[0].name}`))
+		.catch(err => logger.error(err));
 
 });
 
@@ -58,19 +84,19 @@ client.on("guildCreate", (guild) => {
 		if (error == TypeError) {
 			return;
 		}
-		else {console.log(`Unknown error raised while trying to send a message on guild join. err: ${error}`);}
+		else {logger.error(`Unknown error raised while trying to send a message on guild join. err: ${error}`);}
 	}
 });
 
 client.on("message", (msg) => {
 	if (msg.content.startsWith("!cs")) {
 		rp.post("http://localhost:3000/api/prefixCount")
-			.catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`));
+			.catch(err => logger.error(`Unsuccesful transaction with back end.. error: ${err}`));
 	}
 });
 
 process.on("SIGINT", function() {
-	console.log("Shutting down....");
+	logger.info("Shutting down....");
 	client.destroy();
 	process.exit(0);
 });
