@@ -1,9 +1,7 @@
 node_modules
 package-lock.json
 csgo-worker/test.js
+server/steamServers.json
 server/.env
 .env
-server/server-logs.log
-server/steamServers.json
-server-logs.log
-bot-logs.log
+logs
