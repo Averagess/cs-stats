@@ -3,7 +3,7 @@ const rp = require("request-promise");
 const dotenv = require("dotenv");
 const Discord = require("discord.js");
 const moment = require("moment");
-// const modules = require("../../modules/modules");
+const logger = require("../../modules/logger.js");
 dotenv.config();
 
 
@@ -41,7 +41,7 @@ module.exports = class profileCommand extends Command {
 			const URL = extracted[3].replace("/", "");
 			const qString = `http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${things.apiKey}&vanityurl=${URL}`;
 			// eslint-disable-next-line max-statements-per-line
-			await rp(qString).then(res => {const data = JSON.parse(res);things.target = data.response.steamid;}).catch(err => console.log(err));
+			await rp(qString).then(res => {const data = JSON.parse(res);things.target = data.response.steamid;}).catch(err => logger.error(err));
 		}
 		else if (text.toLowerCase().includes("steamcommunity.com/profiles/")) {
 			const regex = /([\d])\w+/g;
@@ -50,7 +50,6 @@ module.exports = class profileCommand extends Command {
 		}
 		else if (text.match(/([\d]){17}/g)) {
 			if (text.match(/([\d]){17}/g).length !== 1) {return message.say("Steam API couldn't find the provided account. Double check your syntax and try again.");}
-			console.log("steam id provided");
 		}
 		else {return message.say("Steam API couldn't find the provided account. Double check your syntax and try again.");}
 		const url1 = { uri:`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${things.apiKey}&steamids=${things.target}` };
@@ -95,7 +94,7 @@ module.exports = class profileCommand extends Command {
 				rp.post({
 					uri:"http://localhost:3000/api/data",
 					json:{ "command":"profile" },
-				}).catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`));
+				}).catch(err => logger.error(`Unsuccesful transaction with back end.. error: ${err}`));
 				return message.say(profileEmbed);
 				// If something went wrong
 				// throw new Error('messed up')
@@ -134,7 +133,7 @@ module.exports = class profileCommand extends Command {
 					rp.post({
 						uri:"http://localhost:3000/api/data",
 						json:{ "command":"profile" },
-					}).catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`));
+					}).catch(err => logger.error(`Unsuccesful transaction with back end.. error: ${err}`));
 					return message.say(profileEmbed);
 				}
 			});

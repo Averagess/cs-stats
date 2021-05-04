@@ -1,5 +1,6 @@
 const { Command } = require("discord.js-commando");
 const rp = require("request-promise");
+const logger = require("../../modules/logger.js");
 
 module.exports = class blacklistCommand extends Command {
 	constructor(client) {
@@ -37,7 +38,7 @@ module.exports = class blacklistCommand extends Command {
 				else if (err.statusCode == 400) {
 					return message.reply(`Bot's request body was empty when blacklisting user ${mention}`);
 				}
-				console.log(`error while blacklisting, err: ${err}`);
+				logger.error(`Error while blacklisting, err: ${err}`);
 				return message.reply(`Error while blacklisting user ${mention}`);
 			});
 	}

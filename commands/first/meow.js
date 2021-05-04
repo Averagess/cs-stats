@@ -1,5 +1,5 @@
 const { Command } = require("discord.js-commando");
-
+const logger = require("../../modules/logger.js");
 module.exports = class MeowCommand extends Command {
 	constructor(client) {
 		super(client, {
@@ -17,6 +17,7 @@ module.exports = class MeowCommand extends Command {
 	}
 
 	run(message) {
+		logger.info("lol");
 		return message.say("Meow!");
 	}
 };

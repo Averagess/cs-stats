@@ -2,6 +2,8 @@ const { Command } = require("discord.js-commando");
 const { MessageEmbed } = require("discord.js");
 const rp = require("request-promise");
 const { readableNumber } = require("../../modules/modules.js");
+const logger = require("../../modules/logger.js");
+
 module.exports = class mmstats extends Command {
 	constructor(client) {
 		super(client, {
@@ -46,7 +48,7 @@ module.exports = class mmstats extends Command {
 				rp.post({
 					uri:"http://localhost:3000/api/data",
 					json:{ "command":"mm-stats" },
-				}).catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`)),
+				}).catch(err => logger.error(`Unsuccesful transaction with back end.. error: ${err}`)),
 			);
 	}
 };

@@ -1,6 +1,5 @@
 const { MessageEmbed } = require("discord.js");
 const { Command } = require("discord.js-commando");
-
 module.exports = class feedbackCommand extends Command {
 	constructor(client) {
 		super(client, {

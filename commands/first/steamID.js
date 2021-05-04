@@ -4,6 +4,7 @@ const rp = require("request-promise");
 const { decToHex } = require("hex2dec");
 const { MessageEmbed } = require("discord.js");
 const m = require("../../modules/modules.js");
+const logger = require("../../modules/logger.js");
 dotenv.config();
 
 module.exports = class steamid extends Command {
@@ -41,7 +42,7 @@ module.exports = class steamid extends Command {
 			const URL = extracted.pop().replace("/", "");
 			const qString = `http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${things.apiKey}&vanityurl=${URL}`;
 			// eslint-disable-next-line max-statements-per-line
-			await rp(qString).then(res => {const data = JSON.parse(res);things.target = data.response.steamid;}).catch(err => console.log(err));
+			await rp(qString).then(res => {const data = JSON.parse(res);things.target = data.response.steamid;}).catch(err => logger.err(err));
 		}
 		else if (text.toLowerCase().includes("steamcommunity.com/profiles/")) {
 			const regex = /([\d])\w+/g;
@@ -73,7 +74,7 @@ module.exports = class steamid extends Command {
 			rp.post({
 				uri:"http://localhost:3000/api/data",
 				json:{ "command":"steamid" },
-			}).catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`)),
+			}).catch(err => logger.error(`Unsuccesful transaction with back end.. error: ${err}`)),
 		);
 	}
 };
