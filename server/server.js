@@ -109,8 +109,6 @@ steamFriends.on("friend", async (steamid, res) => {
 			const accountid = CSGO.ToAccountID(steamid);
 			CSGO.playerProfileRequest(accountid);
 			CSGO.on("playerProfile", function playerProfileHandler(profile) {
-				// console.log(typeof profile);
-				// console.log(profile.account_profiles[0]);
 				const commendations = profile.account_profiles[0].commendation;
 				const mmRankId = profile.account_profiles[0].ranking.rank_id;
 				const mmWins = profile.account_profiles[0].ranking.wins;
@@ -193,6 +191,11 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 			steamFriends.sendMessage(steamid, message);
 		});
 	return;
+	}
+	if (type == 1 && msg == "!cs uptime" && steamid == "76561198116173009") {
+		const currentTime = moment().unix();
+		const difference = (currentTime - startupTime) / 60;
+		return steamFriends.sendMessage(`Uptime: ${Math.floor(difference)} minutes, ${reconnStr(reconnections)}`);
 	}
 	if (type == 1 && msg.startsWith("!cs")) {
 		steamFriends.sendMessage(steamid, "Unrecognized command.");
@@ -477,7 +480,6 @@ process.on("SIGINT", function() {
 		process.exit(0);
 	});
 });
-
-app.listen(PORT, () => {
+app.listen(PORT, "localhost", () => {
 	logger.info(`App listening at .${PORT}`);
 });
