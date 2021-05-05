@@ -7,23 +7,51 @@ const rp = require("request-promise");
 const dotenv = require("dotenv");
 const fs = require("fs");
 const readline = require("readline");
+const winston = require ("winston");
 const moment = require("moment");
 const { waitFor } = require("wait-for-event");
-const { time } = require("../modules/modules");
+const { combine, timestamp, printf, prettyPrint, metadata, colorize } = winston.format;
+const { reconnStr } = require("../modules/modules");
 dotenv.config();
 
 const app = express();
-
-const uri = process.env.MONGOURI;
-const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 app.use(bodyParser.json());
+
+const timezoned = () => {
+    return new Date().toLocaleString("en-GB", {
+        timeZone: "Europe/Helsinki",
+    });
+};
+
+const logFormat = printf(info => `[${info.timestamp}] [${info.level}] ${info.message}`);
+const logger = winston.createLogger({
+	format: combine(
+		timestamp({ format : timezoned }),
+		prettyPrint(),
+		metadata({ fillExcept: ["message", "level", "timestamp"] }),
+	),
+	transports: [
+		new winston.transports.Console({
+			format: combine(
+				colorize(),
+				logFormat),
+			handleRejections: true,
+			// handleExceptions: true,
+		}),
+		new winston.transports.File({ filename: "../logs/server-logs.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
+		],
+  });
+
+const mongoClient = new MongoClient(process.env.MONGOURI, { useNewUrlParser: true, useUnifiedTopology: true });
 const PORT = 3000;
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
 });
 
-let logInTime;
+const startupTime = moment().unix();
+let reconnections = 0;
+
 const Steam = require("steam"),
 	steamClient = new Steam.SteamClient(),
 	steamUser = new Steam.SteamUser(steamClient),
@@ -35,21 +63,28 @@ const Steam = require("steam"),
 if (fs.existsSync("steamServers.json")) {
 	Steam.servers = JSON.parse(fs.readFileSync("steamServers.json", "utf8"));
 }
+else {
+	logger.info("No steamServers.json file. Loading default servers.");
+}
 
 steamClient.connect();
 steamClient.on("connected", function() {
 	steamUser.logOn({
 		account_name: process.env.STEAMUSERNAME,
 		password: process.env.STEAMPASSWORD,
-		two_factor_code: process.argv[2],
+		// two_factor_code: process.argv[2],
 	});
 });
 
 steamClient.on("servers", (servers) => {
 	const stringArr = JSON.stringify(servers);
 	fs.writeFile("steamServers.json", stringArr, "utf-8", (err) => {
-		if (err) {console.log(err);}
-		else {console.log(`${time()} Updated steamServers list file.`);}
+		if (err) {
+			logger.error(err);
+		}
+		else {
+			logger.info("Updated steamServers list file.");
+		}
 	});
 });
 
@@ -62,10 +97,10 @@ steamFriends.on("friend", async (steamid, res) => {
 			await waitFor("ready", CSGO);
 		}
 		else if (res == 2) {
-			console.log(`${ time() } Received an friend request from ${steamid} while online`);
+			logger.info(`Received an friend request from ${steamid} while online`);
 			await steamFriends.addFriend(steamid);
 		}
-		console.log(`${ time() } Succesfully added ${steamid} to friends`);
+		logger.info(`Succesfully added ${steamid} to friends`);
 		const qString = `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=A46EE240150FDB461D92C711B23C66BF&steamids=${steamid}`;
 		rp(qString)
 		.then(steamRes => {
@@ -74,8 +109,6 @@ steamFriends.on("friend", async (steamid, res) => {
 			const accountid = CSGO.ToAccountID(steamid);
 			CSGO.playerProfileRequest(accountid);
 			CSGO.on("playerProfile", function playerProfileHandler(profile) {
-				// console.log(typeof profile);
-				// console.log(profile.account_profiles[0]);
 				const commendations = profile.account_profiles[0].commendation;
 				const mmRankId = profile.account_profiles[0].ranking.rank_id;
 				const mmWins = profile.account_profiles[0].ranking.wins;
@@ -94,7 +127,9 @@ steamFriends.on("friend", async (steamid, res) => {
 				};
 				steamFriends.removeFriend(steamid);
 				rp.post("http://localhost:3000/api/testing", { json: payload })
-				.then(console.log(`${ time() } Successfully forwarded data to update`)).catch(err => console.log("error: " + err));
+				.then(logger.info("Successfully forwarded data to update")).catch(err => {
+					logger.error(err);
+				});
 				CSGO.removeAllListeners();
 			});
 		});
@@ -102,17 +137,15 @@ steamFriends.on("friend", async (steamid, res) => {
 	}
 
 	if (res == 0) {
-		console.log(`${ time() } ${steamid} removed me from friends`);
+		logger.info(`${steamid} removed me from friends`);
 		return;
 	}
-	console.log(res);
-	},
-);
+});
 
 steamFriends.on("relationships", () => {
 	Object.keys(steamFriends.friends).forEach(key => {
 		if (steamFriends.friends[key] == 2) {
-			console.log(`${ time() } Received an Friends request from: ${key} while offline, Accepting..`);
+			logger.info(`Received an Friends request from: ${key} while offline, Accepting..`);
 			steamFriends.addFriend(key);
 		}
 	});
@@ -124,7 +157,7 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 		return;
 	}
 	if (type == 1 && msg == "!cs update") {
-		console.log(`${time()} Received an steamchat update request from steamid : ${steamid}`);
+		logger.info(`Received an steamchat update request from steamid : ${steamid}`);
 		const profile = await rp("http://localhost:3000/api/fetchPlayerRank", { json: { steamid : steamid } });
 		const qString = `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=A46EE240150FDB461D92C711B23C66BF&steamids=${steamid}`;
 		const steamProfile = await rp(qString);
@@ -148,16 +181,21 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 		};
 		rp.post("http://localhost:3000/api/testing", { json: payload })
 		.then(() => {
+			logger.info(`Successfully forwarded data to update for steamid ${steamid}`);
 			const message = "Your rank has been successfully updated!";
-			console.log(`${ time() } Successfully forwarded data to update for steamid ${steamid}`);
 			steamFriends.sendMessage(steamid, message);
 		})
 		.catch(err => {
+			logger.err(`Unsuccessful rank update!! ERR: ${err}`);
 			const message = "Your rank wasnt updated. Try again later";
-			console.log(`${time()} Unsuccessful rank update!! ERR: ${err}`);
 			steamFriends.sendMessage(steamid, message);
 		});
 	return;
+	}
+	if (type == 1 && msg == "!cs uptime" && steamid == "76561198116173009") {
+		const currentTime = moment().unix();
+		const difference = (currentTime - startupTime) / 60;
+		return steamFriends.sendMessage(`Uptime: ${Math.floor(difference)} minutes, ${reconnStr(reconnections)}`);
 	}
 	if (type == 1 && msg.startsWith("!cs")) {
 		steamFriends.sendMessage(steamid, "Unrecognized command.");
@@ -165,44 +203,41 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 });
 
 steamClient.on("error", (err) => {
-	console.log(`${time()} ${err}`);
-	process.exit(0);
+	logger.error(err);
+	try {
+		logger.info("Attempting reconnecting..");
+		steamClient.connect();
+	}
+	catch (error) {
+		logger.error(`Couldnt Connect.. err: ${error}`);
+	}
 });
 
 steamClient.on("logOnResponse", function(res) {
 	if (res.eresult == Steam.EResult.OK) {
-		console.log(`${time()} Successful steam login`);
-		mongoClient.connect().then(console.log(`${time()} Successfully connected to DB!`)).catch(reason => `MongoDB ERROR: ${reason} `);
+		logger.info("Successful steam login");
+		mongoClient.connect().then(logger.info("Successfully connected to DB!")).catch(reason => logger.error(`MongoDB ERROR: ${reason}`));
 		CSGO.launch();
-		logInTime = moment().unix();
+		reconnections++;
 	}
-	else if (res.eresult == Steam.EResult.InvalidPassword) {
-		console.log(`${time()} ERR: Invalid Password`);
-		return;
+	else {
+		Object.keys(Steam.EResult).forEach((key, value) => {
+			if (value == res.eresult) {
+				logger.error(`Error raised while signing to steam. err: ${key}`);
+				logger.info("Shutting Down..");
+				steamClient.disconnect();
+				process.exit();
+			}
+		});
 	}
-	else if (res.eresult == Steam.EResult.TwoFactorCodeMismatch) {
-		console.log(`${time()} ERR: Invalid Two Factor Code`);
-		return;
-	}
-	else if (res.eresult == Steam.EResult.LoggedInElsewhere) {
-		console.log(`${time()} ERR: Bot Account logged in elsewhere`);
-		return;
-	}
-	else if (res.eresult == Steam.EResult.AccountLoginDeniedNeedTwoFactor) {
-		console.log(`${time()} ERR: No Two Factor Code, Please provide the code.`);
-		return;
-	}
-	else {console.log(`ERR: ${res.eresult} Check: https://github.com/SteamRE/SteamKit/blob/master/Resources/SteamLanguage/eresult.steamd#L96`); return;}
-	// to display your bot's status as "Online"
-	// steamFriends.setPersonaState(Steam.EPersonaState.Online);
 });
 
 CSGO.on("ready", function onReady() {
-	console.log(`${ time() } CS:GO Client Ready`);
+	logger.info("CS:GO Client Ready");
 });
 
 CSGO.on("unready", function OnUnready() {
-	console.log(`${ time() } CS:GO Client unready`);
+	logger.info("CS:GO Client Unready");
 });
 
 app.post("/api/prefixCount", async (req, res) => {
@@ -227,34 +262,31 @@ app.post("/api/data", async (req, res) => {
 		});
 	}
 	async function commandRan(command) {
-		// try {
-		// await mongoClient.connect();
-		// const options = { upsert : true };
 		const database = mongoClient.db("DiscordData");
 		const collection = database.collection("discord");
 		if (command === "stats") {
 			const query = { "statsUsedCount": { $exists: true } };
 			await collection.updateOne(query,
 				{ $inc: { "statsUsedCount": 1 } },
-			).then(res.send("OK!")).catch(err => {console.log(err); res.status(500).send("Internal Server Error");});
+			).then(res.send("OK!")).catch(err => {logger.error(err); res.status(500).send("Internal Server Error");});
 		}
 		else if (command === "profile") {
 			const query = { "profileUsedCount": { $exists: true } };
 			await collection.updateOne(query,
 				{ $inc: { "profileUsedCount": 1 } },
-			).then(res.send("OK!")).catch(err => {console.log(err); res.status(500).send("Internal Server Error");});
+			).then(res.send("OK!")).catch(err => {logger.error(err); res.status(500).send("Internal Server Error");});
 		}
 		else if (command === "steamid") {
 			const query = { "steamidUsedCount": { $exists: true } };
 			await collection.updateOne(query,
 				{ $inc: { "steamidUsedCount": 1 } },
-			).then(res.send("OK!")).catch(err => {console.log(err); res.status(500).send("Internal Server Error");});
+			).then(res.send("OK!")).catch(err => {logger.error(err); res.status(500).send("Internal Server Error");});
 		}
 		else if (command === "mm-stats") {
 			const query = { "mm-statsUsedCount": { $exists: true } };
 			await collection.updateOne(query,
 				{ $inc: { "mm-statsUsedCount": 1 } },
-			).then(res.send("OK!")).catch(err => {console.log(err); res.status(500).send("Internal Server Error");});
+			).then(res.send("OK!")).catch(err => {logger.error(err); res.status(500).send("Internal Server Error");});
 		}
 	}
 	commandRan(req.body.command);
@@ -267,21 +299,41 @@ app.get("/api/getRank", async (req, res) => {
 	else if (!req.body.steamID) {
 		return res.status(500).send("Invalid Request");
 	}
-	// REQ BODY steamID
 	const database = mongoClient.db("DiscordData");
 	const collection = database.collection("ranks");
 	const query = { "steamid64": req.body.steamID };
 	const find = await collection.findOne(query);
 	if (find == null) {
-		res.status(200).send("No stats for were found for this account");
+		res.status(200).send("No stats were found for this account");
 	}
 	else {
 		res.status(200).send(find);
 	}
 });
 
+app.post("/api/blacklistUser", async (req, res) => {
+	if (!req.body) {
+		return res.status(400).send("Request body was empty");
+	}
+	fs.readFile("blacklist.json", (err, data) => {
+		if (err) {
+			return logger.error("error while reading blacklist.json at /api/blacklistUser");
+		}
+		const arr = JSON.parse(data);
+		if (arr.includes(req.body.userID)) {
+			return res.status(304).send("User is already blacklisted");
+		}
+		else {
+			arr.push(req.body.userID);
+			fs.writeFile("blacklist.json", JSON.stringify(arr), () => {
+				return res.status(200).send("User blacklisted");
+			});
+		}
+	});
+});
+
 app.post("/api/testing", async (req, res) => {
-	console.log(`${ time() } PlayerDB request received!`);
+	logger.info("PlayerDB request received!");
 	const database = mongoClient.db("DiscordData");
 	const collection = database.collection("ranks");
 	const query = { "steamid64": req.body.steamid64 };
@@ -307,7 +359,7 @@ app.post("/api/testing", async (req, res) => {
 			lastUpdate: date,
 			};
 		const result = await collection.insertOne(doc);
-		console.log(`${ time() } ${result.insertedCount} documents were inserted with the _id: ${result.insertedId}`);
+		logger.info(`${result.insertedCount} documents were inserted with the _id: ${result.insertedId}`);
 	}
 	else {
 		// Update
@@ -324,13 +376,13 @@ app.post("/api/testing", async (req, res) => {
 					lastUpdate: date },
 		};
 		const result = await collection.updateOne(find, updateDoc);
-		console.log(`${ time() } Updated ${result.modifiedCount} Docs`);
+		logger.info(`Updated ${result.modifiedCount} Docs`);
 	}
 	res.status(200).send("OK");
 });
 
 app.get("/api/getMatchmaking", (req, res) => {
-	console.log(`${ time() } Received Matchmaking Request`);
+	logger.info("Received Matchmaking Request");
 	CSGO.matchmakingStatsRequest();
 	CSGO.on("matchmakingStatsData", function onMatchmakingStats(stats) {
 		res.send(JSON.stringify(stats));
@@ -340,7 +392,7 @@ app.get("/api/getMatchmaking", (req, res) => {
 });
 
 app.get("/api/updateFriendslist", (req, res) => {
-	res.send("OK");
+	res.status(200).send("OK");
 	const interval = 4000;
 	let promise = Promise.resolve();
 	Object.keys(steamFriends.friends).forEach(key => {
@@ -376,7 +428,7 @@ app.get("/api/updateFriendslist", (req, res) => {
 			});
 		});
 	});
-	promise.then(console.log(`${ time() } Friendlist playerdata updating loop finished.`));
+	promise.then(logger.info("Friendlist playerdata updating loop finished."));
 });
 
 app.get("/api/fetchPlayerRank", async (req, res) => {
@@ -406,29 +458,28 @@ app.get("/api/getMatchData", (req, res) => {
 	});
 });
 
-
 rl.on("line", (input) => {
 	if (input == "uptime") {
 		const currentTime = moment().unix();
-		const difference = (currentTime - logInTime) / 60;
-		console.log(`Uptime: ${Math.floor(difference)} minutes`);
+		const difference = (currentTime - startupTime) / 60;
+		logger.info(`Uptime: ${Math.floor(difference)} minutes, ${reconnStr(reconnections)}`);
 	}
 	else {
-		console.log(`${time()} INPUT ERR: Unknown Command: ["${input}"]`);
+		logger.info(`INPUT ERR: Unknown Command: ["${input}"]`);
 	}
 });
+
 process.on("SIGINT", function() {
-	console.log(`${time()} Shutting down....`);
+	logger.info("Shutting down....");
 	mongoClient.close(function() {
 		const currentTime = moment().unix();
-		console.log(`${ time() } MongoDB disconnected on app termination`);
-		CSGO.exit(console.log(`${ time() } CS:GO disconnected on app termination`));
-		steamClient.disconnect(console.log(`${ time() } Steam disconnected on app termination`));
-		console.log(`Server uptime was: ${Math.floor((currentTime - logInTime) / 60)} minutes.`);
+		logger.info("MongoDB disconnected on app termination");
+		CSGO.exit(logger.info("CS:GO disconnected on app termination"));
+		steamClient.disconnect(logger.info("Steam disconnected on app termination"));
+		logger.info(`Server uptime was: ${Math.floor((currentTime - startupTime) / 60)} minutes and there were a total of ${reconnStr(reconnections)}`);
 		process.exit(0);
 	});
 });
-
-app.listen(PORT, () => {
-	console.log(`App listening at .${PORT}`);
+app.listen(PORT, "localhost", () => {
+	logger.info(`App listening at .${PORT}`);
 });

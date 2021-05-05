@@ -1,7 +1,7 @@
 {
   "name": "cs-stats",
-  "version": "1.0.0",
-  "description": "discord bot made for fetching csgo stats",
+  "version": "2.0.0",
+  "description": "Discord bot made for fetching CS:GO stats",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -126,4 +126,12 @@ module.exports = {
 			return "http://steamcommunity.com/profiles/" + steamid64;
 		},
 	},
+	reconnStr: (count) => {
+		if (count == 1) {
+			return "no reconnections";
+		}
+		else {
+			return `${count} reconnections`;
+		}
+	},
 };

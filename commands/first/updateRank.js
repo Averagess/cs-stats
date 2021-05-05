@@ -7,17 +7,26 @@ module.exports = class updaterank extends Command {
 			group: "first",
 			memberName: "updaterank",
 			description: "Replies with instructions on how to update your rank",
+			argsPromptLimit: 0,
+			throttling: {
+				usages: 2,
+				duration: 10,
+			},
 		});
 	}
 
 	run(message) {
+		const steamcommunityEmbed = new MessageEmbed()
+			.setColor("#FFA500")
+			.setTitle("Steam Community :: Ricksaw")
+			.setURL("https://steamcommunity.com/id/ricksawBot")
+			.setThumbnail(this.client.user.displayAvatarURL());
 		const embed = new MessageEmbed()
 			.setColor("#FFA500")
-			.setTitle("Bot's Steam profile link")
-			.setDescription("In order for the bot to know your rank, you need to add it to your friends list on steam. We wont message you on steam, and we will remove you almost instantly so we wont take any friends list space.")
-			.setURL("https://steamcommunity.com/id/ricksawBot")
+			.setTitle("Updating your rank")
+			.setDescription("In order for the bot to know your rank, you need to add it to your steam friends list. We wont message you on steam, and we will remove you almost instantly so we wont take any friends list space.")
 			.setTimestamp()
 			.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
-		return message.say(embed);
+		return message.say(steamcommunityEmbed).then(message.say(embed));
 	}
 };

@@ -1,8 +1,9 @@
-const { Command } = require("discord.js-commando");
 const dotenv = require("dotenv");
+const { Command } = require("discord.js-commando");
 const { MessageEmbed } = require("discord.js");
 const rp = require("request-promise");
 const { readableNumber } = require("../../modules/modules.js");
+const logger = require("../../modules/logger.js");
 dotenv.config();
 
 module.exports = class statsCommand extends Command {
@@ -12,10 +13,12 @@ module.exports = class statsCommand extends Command {
 			group: "first",
 			memberName: "stats",
 			description: "Replies with a set of CS:GO stats.",
+			argsPromptLimit: 0,
+			format: "<steamcommunity link> / <steamid64>",
 			args: [
 				{
 					key: "text",
-					prompt: "Steam profile link",
+					prompt: "steam profile link",
 					type: "string",
 				},
 			],
@@ -43,7 +46,6 @@ module.exports = class statsCommand extends Command {
 		}
 		else if (text.match(/([\d]){17}/g)) {
 			if (text.match(/([\d]){17}/g).length !== 1) {return message.say("Steam API couldn't find the provided account. Double check your syntax and try again.");}
-			console.log("steam id provided");
 		}
 		else {return message.say("Steam API couldn't find the provided account. Double check your syntax and try again.");}
 		const url1 = { uri: `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${things.apiKey}&steamids=${things.target}` };
@@ -98,15 +100,14 @@ module.exports = class statsCommand extends Command {
 				rp.post({
 					uri:"http://localhost:3000/api/data",
 					json:{ "command":"stats" },
-				}).catch(err => console.log(`Unsuccesful transaction with back end.. error: ${err}`));
+				}).catch(err => logger.error(`Unsuccesful transaction with back end.. error: ${err}`));
 				return message.say(embedMessage);
 			})
 			.catch(err => {
 				if (err.statusCode == 500) {
-					console.log(err);
 					return message.say("This profile has set game details to private, To view the stats you need to set these details to public.");
 				}
-				console.log(err);
+				logger.error(err);
 			});
 	}
 };
