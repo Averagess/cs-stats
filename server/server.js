@@ -195,7 +195,7 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 	if (type == 1 && msg == "!cs uptime" && steamid == "76561198116173009") {
 		const currentTime = moment().unix();
 		const difference = (currentTime - startupTime) / 60;
-		return steamFriends.sendMessage(`Uptime: ${Math.floor(difference)} minutes, ${reconnStr(reconnections)}`);
+		return steamFriends.sendMessage(steamid, `Uptime: ${Math.floor(difference)} minutes, ${reconnStr(reconnections)}`);
 	}
 	if (type == 1 && msg.startsWith("!cs")) {
 		steamFriends.sendMessage(steamid, "Unrecognized command.");
