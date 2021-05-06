@@ -208,6 +208,7 @@ steamClient.on("error", (err) => {
 	try {
 		logger.info("Attempting reconnecting..");
 		steamClient.connect();
+		reconnections++;
 	}
 	catch (error) {
 		logger.error(`Couldnt Connect.. err: ${error}`);
@@ -219,7 +220,6 @@ steamClient.on("logOnResponse", function(res) {
 		logger.info("Successful steam login");
 		mongoClient.connect().then(logger.info("Successfully connected to DB!")).catch(reason => logger.error(`MongoDB ERROR: ${reason}`));
 		CSGO.launch();
-		reconnections++;
 	}
 	else {
 		Object.keys(Steam.EResult).forEach((key, value) => {
