@@ -5,6 +5,7 @@ const { decToHex } = require("hex2dec");
 const { MessageEmbed } = require("discord.js");
 const m = require("../../modules/modules.js");
 const logger = require("../../modules/logger.js");
+const { version } = require("../../package.json");
 dotenv.config();
 
 module.exports = class steamid extends Command {
@@ -68,7 +69,7 @@ module.exports = class steamid extends Command {
 					{ name: "Hex ID", value: hexid },
 				)
 				.setTimestamp()
-				.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
+				.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());
 			return message.say(profileEmbed);
 		}).then(
 			rp.post({

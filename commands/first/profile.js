@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const Discord = require("discord.js");
 const moment = require("moment");
 const logger = require("../../modules/logger.js");
+const { version } = require("../../package.json");
 dotenv.config();
 
 
@@ -85,7 +86,7 @@ module.exports = class profileCommand extends Command {
 					)
 					.setDescription("Steam Profile")
 					.setTimestamp()
-					.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
+					.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());
 
 				if (typeof steamProfileData.gameextrainfo !== "undefined") {
 					profileEmbed.addField("Currently playing", steamProfileData.gameextrainfo);
@@ -124,7 +125,7 @@ module.exports = class profileCommand extends Command {
 						)
 						.setDescription("Steam Profile")
 						.setTimestamp()
-						.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
+						.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());
 
 					if (typeof steamProfileData.gameextrainfo !== "undefined") {
 						profileEmbed.addField("Currently playing", steamProfileData.gameextrainfo);

@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js");
 const { Command } = require("discord.js-commando");
+const { version } = require("../../package.json");
 module.exports = class feedbackCommand extends Command {
 	constructor(client) {
 		super(client, {
@@ -34,7 +35,7 @@ module.exports = class feedbackCommand extends Command {
 			.setTitle(`${message.author.tag}'s feedback`)
 			.setDescription(text)
 			.setTimestamp()
-			.setFooter(`Ricksaw CSGO Bot, author's id: ${message.author.id}`, this.client.user.displayAvatarURL());
+			.setFooter(`Ricksaw CSGO Bot, author's id: ${message.author.id} v${version}`, this.client.user.displayAvatarURL());
 		this.client.channels.fetch(feedbackTextChannel).then(channel => {
 			channel.send(feedbackEmbed)
 				.then((feedbackMessage) => {

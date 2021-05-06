@@ -1,5 +1,6 @@
 const { Command } = require("discord.js-commando");
 const { MessageEmbed } = require("discord.js");
+const { version } = require("../../package.json");
 module.exports = class updaterank extends Command {
 	constructor(client) {
 		super(client, {
@@ -26,7 +27,7 @@ module.exports = class updaterank extends Command {
 			.setTitle("Updating your rank")
 			.setDescription("In order for the bot to know your rank, you need to add it to your steam friends list. We wont message you on steam, and we will remove you almost instantly so we wont take any friends list space.")
 			.setTimestamp()
-			.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
+			.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());
 		return message.say(steamcommunityEmbed).then(message.say(embed));
 	}
 };

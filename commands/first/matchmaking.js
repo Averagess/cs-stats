@@ -3,6 +3,7 @@ const { MessageEmbed } = require("discord.js");
 const rp = require("request-promise");
 const { readableNumber } = require("../../modules/modules.js");
 const logger = require("../../modules/logger.js");
+const { version } = require("../../package.json");
 
 module.exports = class mmstats extends Command {
 	constructor(client) {
@@ -42,7 +43,7 @@ module.exports = class mmstats extends Command {
 						{ name: "Search time average", value: `${searchtimeAvg} minutes`, inline:true },
 					)
 					.setTimestamp()
-					.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
+					.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());
 				return message.say(statsEmbed);
 			}).then(
 				rp.post({
