@@ -27,7 +27,7 @@ module.exports = class statusCommand extends Command {
 					.setColor("#FFA500")
 					.setTitle("Status")
 					.addFields(
-						{ name: "Server uptime", value: data.uptime },
+						{ name: "Server uptime ", value: `${data.uptime} minutes` },
 						{ name: "Total reconnections to steam", value: data.reconnections },
 						{ name: "Logged in to steam", value: data.steamLoggedIn },
 						{ name: "Logged in to database", value: data.mongoLoggedIn },
