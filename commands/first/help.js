@@ -1,5 +1,6 @@
 const { Command } = require("discord.js-commando");
 const { MessageEmbed } = require("discord.js");
+const { version } = require("../../package.json");
 module.exports = class helpCommand extends Command {
 	constructor(client) {
 		super(client, {
@@ -29,7 +30,7 @@ module.exports = class helpCommand extends Command {
 			.setTitle("Commands")
 			.setThumbnail("https://i.pinimg.com/originals/b1/02/24/b10224ae75edd5debd06c44662cbcb30.png")
 			.setTimestamp()
-			.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
+			.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());
 		cmds.forEach(item => {
 			// const possibleArgs = item.argsCollector.args[0].prompt;
 			if (item.argsCollector !== null) {

@@ -4,6 +4,7 @@ const { MessageEmbed } = require("discord.js");
 const rp = require("request-promise");
 const { readableNumber } = require("../../modules/modules.js");
 const logger = require("../../modules/logger.js");
+const { version } = require("../../package.json");
 dotenv.config();
 
 module.exports = class statsCommand extends Command {
@@ -83,7 +84,7 @@ module.exports = class statsCommand extends Command {
 						{ name: "Accuracy", value: `${accuracy} %`, inline:true },
 					)
 					.setTimestamp()
-					.setFooter("Ricksaw CSGO Bot", this.client.user.displayAvatarURL());
+					.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());
 				if (csgoData.rankString) {
 					embedMessage.addFields(
 						{ name: "Friendly", value: csgoData.commendation.cmd_friendly, inline: true },
