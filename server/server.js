@@ -125,6 +125,7 @@ steamFriends.on("friend", async (steamid, res) => {
 					"playerCurExp":playerCurExp,
 					"commendations":commendations,
 				};
+				steamFriends.sendMessage(steamid, "Successfully updated your profile, i will now remove you to keep my friends list clear. You can add me if you want to update your data again!");
 				steamFriends.removeFriend(steamid);
 				rp.post("http://localhost:3000/api/testing", { json: payload })
 				.then(logger.info("Successfully forwarded data to update")).catch(err => {
