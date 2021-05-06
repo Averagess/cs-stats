@@ -125,6 +125,7 @@ steamFriends.on("friend", async (steamid, res) => {
 					"playerCurExp":playerCurExp,
 					"commendations":commendations,
 				};
+				steamFriends.sendMessage(steamid, "Successfully updated your profile, i will now remove you to keep my friends list clear. You can add me if you want to update your data again!");
 				steamFriends.removeFriend(steamid);
 				rp.post("http://localhost:3000/api/testing", { json: payload })
 				.then(logger.info("Successfully forwarded data to update")).catch(err => {
@@ -207,6 +208,7 @@ steamClient.on("error", (err) => {
 	try {
 		logger.info("Attempting reconnecting..");
 		steamClient.connect();
+		reconnections++;
 	}
 	catch (error) {
 		logger.error(`Couldnt Connect.. err: ${error}`);
@@ -218,7 +220,6 @@ steamClient.on("logOnResponse", function(res) {
 		logger.info("Successful steam login");
 		mongoClient.connect().then(logger.info("Successfully connected to DB!")).catch(reason => logger.error(`MongoDB ERROR: ${reason}`));
 		CSGO.launch();
-		reconnections++;
 	}
 	else {
 		Object.keys(Steam.EResult).forEach((key, value) => {
@@ -462,7 +463,7 @@ app.get("/api/status", (req, res) => {
 	const currentTime = moment().unix();
 	const difference = Math.floor((currentTime - startupTime) / 60);
 	const data = {
-		uptime: difference / 60,
+		uptime: difference,
 		reconnections: reconnStr(reconnections),
 		steamLoggedIn: steamClient.loggedOn,
 		mongoLoggedIn: mongoClient.isConnected(),
