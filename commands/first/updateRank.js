@@ -25,7 +25,7 @@ module.exports = class updaterank extends Command {
 		const embed = new MessageEmbed()
 			.setColor("#FFA500")
 			.setTitle("Updating your rank")
-			.setDescription("In order for the bot to know your rank, you need to add it to your steam friends list. We wont message you on steam, and we will remove you almost instantly so we wont take any friends list space.")
+			.setDescription("In order for the bot to know your rank, you need to add it to your Steam friends list. This process only takes a second, and after the process the bot will remove you from their friends list.")
 			.setTimestamp()
 			.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());
 		return message.say(steamcommunityEmbed).then(message.say(embed));
