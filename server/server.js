@@ -463,7 +463,7 @@ app.get("/api/status", (req, res) => {
 	const currentTime = moment().unix();
 	const difference = Math.floor((currentTime - startupTime) / 60);
 	const data = {
-		uptime: difference / 60,
+		uptime: difference,
 		reconnections: reconnStr(reconnections),
 		steamLoggedIn: steamClient.loggedOn,
 		mongoLoggedIn: mongoClient.isConnected(),
