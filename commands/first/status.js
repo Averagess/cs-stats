@@ -26,10 +26,10 @@ module.exports = class statusCommand extends Command {
 				const data = JSON.parse(res);
 				const statusEmbed = new MessageEmbed()
 					.setColor("#FFA500")
-					.setTitle("Status")
+					.setTitle("Ricksaw's Status")
 					.addFields(
 						{ name: "Server uptime ", value: `${data.uptime} minutes` },
-						{ name: "Total reconnections to steam", value: data.reconnections },
+						{ name: "Total reconnections to Steam", value: data.reconnections },
 						{ name: "Connected to Steam", value: data.steamLoggedIn },
 						{ name: "Connected to Database", value: data.mongoLoggedIn },
 					)
