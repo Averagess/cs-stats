@@ -72,6 +72,7 @@ steamClient.on("connected", function() {
 	steamUser.logOn({
 		account_name: process.env.STEAMUSERNAME,
 		password: process.env.STEAMPASSWORD,
+		// two_factor_code: process.argv[2],
 	});
 });
 
