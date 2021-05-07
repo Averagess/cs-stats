@@ -36,7 +36,6 @@ const logger = winston.createLogger({
 				colorize(),
 				logFormat),
 			handleRejections: true,
-			// handleExceptions: true,
 		}),
 		new winston.transports.File({ filename: "../logs/server-logs.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
 		],
