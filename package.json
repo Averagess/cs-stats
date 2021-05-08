@@ -1,6 +1,6 @@
 {
   "name": "cs-stats",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Discord bot made for fetching CS:GO stats",
   "main": "main.js",
   "scripts": {
