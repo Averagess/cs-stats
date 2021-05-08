@@ -44,7 +44,7 @@ client.registry
 
 client.on("ready", () => {
 	logger.info(`Ready. Connected as: [${client.user.tag}]`);
-	client.user.setActivity(" : !cs", { type: "LISTENING" })
+	client.user.setActivity(" : !cs help", { type: "LISTENING" })
 		.then(presence => logger.info(`Activity set to ${presence.activities[0].name}`))
 		.catch(err => logger.error(err));
 
