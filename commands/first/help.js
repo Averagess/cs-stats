@@ -28,6 +28,7 @@ module.exports = class helpCommand extends Command {
 		const helpEmbed = new MessageEmbed()
 			.setColor("#FFA500")
 			.setTitle("Commands")
+			.setDescription("Ricksaw bot is for fetching stats about a player, available steam id's or current matchmaking system stats.")
 			.setThumbnail("https://i.pinimg.com/originals/b1/02/24/b10224ae75edd5debd06c44662cbcb30.png")
 			.setTimestamp()
 			.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());

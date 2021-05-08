@@ -11,7 +11,7 @@ module.exports = class mmstats extends Command {
 			name: "mm-stats",
 			group: "first",
 			memberName: "matchmaking",
-			description: "Replies with current CS:GO Matchmaking stats",
+			description: "Replies with current CS:GO Matchmaking stats.",
 			argsPromptLimit: 0,
 			throttling: {
 				usages: 2,

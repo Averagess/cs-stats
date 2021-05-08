@@ -442,23 +442,6 @@ app.get("/api/fetchPlayerRank", async (req, res) => {
 	});
 });
 
-app.get("/api/getMatchData", (req, res) => {
-	if (!req.body || !req.body.shareCode) {
-		res.status(500).send("No sharecode submitted");
-	}
-	const shareCodeUnformatted = req.body.shareCode;
-	const shareCode = shareCodeUnformatted.match(/(CSGO)(.{30})/);
-	const decodedSC = new csgo.SharecodeDecoder(shareCode[0]).decode();
-	const matchID = decodedSC.matchId;
-	const outcomeID = decodedSC.outcomeId;
-	const tokenID = parseInt(decodedSC.tokenId);
-	CSGO.requestGame(matchID, outcomeID, tokenID);
-	CSGO.on("matchList", (match) => {
-		res.send(match);
-		CSGO.removeAllListeners();
-	});
-});
-
 app.get("/api/status", (req, res) => {
 	const currentTime = moment().unix();
 	const difference = Math.floor((currentTime - startupTime) / 60);

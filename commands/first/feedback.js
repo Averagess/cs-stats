@@ -7,7 +7,7 @@ module.exports = class feedbackCommand extends Command {
 			name: "feedback",
 			group: "first",
 			memberName: "feedback",
-			description: "You can submit feedback by using this command",
+			description: "You can submit feedback by using this command.",
 			format: "<feedback message>",
 			argsPromptLimit: 0,
 			throttling: {

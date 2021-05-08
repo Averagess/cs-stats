@@ -10,7 +10,7 @@ module.exports = class statusCommand extends Command {
 			name: "status",
 			group: "first",
 			memberName: "status",
-			description: "Replies with info about the bot's status",
+			description: "Replies with info about the bot's status.",
 			argsPromptLimit: 0,
 			hidden: true,
 			throttling: {
