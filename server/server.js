@@ -12,6 +12,7 @@ const moment = require("moment");
 const { waitFor } = require("wait-for-event");
 const { combine, timestamp, printf, prettyPrint, metadata, colorize } = winston.format;
 const { reconnStr } = require("../modules/modules");
+require("winston-daily-rotate-file");
 dotenv.config();
 
 const app = express();
@@ -38,7 +39,16 @@ const logger = winston.createLogger({
 			handleRejections: true,
 			// handleExceptions: true,
 		}),
-		new winston.transports.File({ filename: "../logs/server-logs.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
+		// new winston.transports.File({ filename: "../logs/server-logs.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
+		new winston.transports.DailyRotateFile({
+			format: winston.format.json(),
+			dirname: "../logs",
+			filename: "server-%DATE%.log",
+			datePattern: "DD-MM-YYYY HH",
+			// zippedArchive: true,
+			maxSize: "20m",
+			maxFiles: "14d",
+		}),
 		],
   });
 
