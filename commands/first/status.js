@@ -27,7 +27,7 @@ module.exports = class statusCommand extends Command {
 				const data = JSON.parse(res);
 				const statusEmbed = new MessageEmbed()
 					.setColor("#FFA500")
-					.setTitle("Ricksaw's Status")
+					.setTitle(`${this.client.user.username}'s status`)
 					.addFields(
 						{ name: "Server uptime ", value: `${data.uptime} minutes` },
 						{ name: "Total reconnections to Steam", value: data.reconnections },
@@ -44,7 +44,7 @@ module.exports = class statusCommand extends Command {
 				if (err.error.code == "ECONNREFUSED") {
 					const statusEmbed = new MessageEmbed()
 						.setColor("#FFA500")
-						.setTitle("Ricksaw's Status")
+						.setTitle(`${this.client.user.username}'s status`)
 						.addFields(
 							{ name: "Server uptime ", value: "unknown" },
 							{ name: "Total reconnections to Steam", value: "unknown" },
