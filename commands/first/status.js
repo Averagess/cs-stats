@@ -33,7 +33,7 @@ module.exports = class statusCommand extends Command {
 						{ name: "Total reconnections to Steam", value: data.reconnections },
 						{ name: "Connected to Steam", value: data.steamLoggedIn },
 						{ name: "Connected to Database", value: data.mongoLoggedIn },
-						{ name: "Total Guilds", value: this.client.guilds.cache.size() },
+						{ name: "Total Guilds", value: this.client.guilds.cache.size },
 					)
 					.setTimestamp()
 					.setFooter(`Ricksaw CSGO Bot v${version}`, this.client.user.displayAvatarURL());
