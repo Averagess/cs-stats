@@ -26,7 +26,7 @@ const logger = winston.createLogger({
 		}),
 		// new winston.transports.File({ filename: "logs/bot-logs.log", format: winston.format.json(), handleRejections: true, handleExceptions: true }),
 		new winston.transports.DailyRotateFile({
-			format: winston.format.json(),
+			format: logFormat,
 			dirname: "logs",
 			filename: "discordbot-%DATE%.log",
 			datePattern: "DD-MM-YYYY HH",
