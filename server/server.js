@@ -44,7 +44,7 @@ const logger = winston.createLogger({
 			format: logFormat,
 			dirname: "../logs",
 			filename: "server-%DATE%.log",
-			datePattern: "DD-MM-YYYY HH",
+			datePattern: "DD-MM-YYYY",
 			// zippedArchive: true,
 			maxSize: "20m",
 			maxFiles: "14d",
