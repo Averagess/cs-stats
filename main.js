@@ -63,12 +63,12 @@ client.on("guildCreate", (guild) => {
 });
 
 client.on("commandRun", (command, promise, message, args, fromPattern, result) => {
-	// If there were no args used with cmd
-	if (result == null) {
+	// If there were no args used with cmd and it was run in a guild
+	if (result == null && message.guild) {
 		return logger.info(`[cmdran] ${message.author.tag} ran cmd [${command.name}] in server [${message.guild.name}]`);
 	}
-	// If message was sent to bot DM'S
-	if (message.guild == null) {
+	// If message was sent to bot DM'S and there were args
+	if (message.guild == null && result != null) {
 		return logger.info(`[cmdran] ${message.author.tag} ran cmd [${command.name}] with args [${result.values[Object.keys(result.values)[0]]}] in DM's`);
 	}
 	// If we have args and msg was in a guild, log this
