@@ -62,6 +62,13 @@ client.on("guildCreate", (guild) => {
 	}
 });
 
+client.on("commandRun", (command, promise, message, args, fromPattern, result) => {
+	if (result == null) {
+		return logger.info(`[cmdran] ${message.author.tag} ran cmd [${command.name}] in server [${message.guild.name}]`);
+	}
+	logger.info(`[cmdran] ${message.author.tag} ran cmd [${command.name}] with args [${result.values[Object.keys(result.values)[0]]}] in server [${message.guild.name}]`);
+});
+
 client.on("message", (msg) => {
 	if (msg.content.startsWith("!cs")) {
 		rp.post("http://localhost:3000/api/prefixCount")
