@@ -205,8 +205,9 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 	}
 	if (type == 1 && msg == "!cs uptime" && steamid == "76561198116173009") {
 		const currentTime = moment().unix();
-		const difference = (currentTime - startupTime) / 60;
-		return steamFriends.sendMessage(steamid, `Uptime: ${Math.floor(difference)} minutes, ${reconnStr(reconnections)}`);
+		const SECONDS = Math.floor(currentTime - startupTime);
+		const uptime = new Date(SECONDS * 1000).toISOString().substr(11, 8);
+		return steamFriends.sendMessage(steamid, `Uptime: ${uptime}, ${reconnStr(reconnections)}`);
 	}
 	if (type == 1 && msg.startsWith("!cs")) {
 		steamFriends.sendMessage(steamid, "Unrecognized command.");
@@ -454,9 +455,10 @@ app.get("/api/fetchPlayerRank", async (req, res) => {
 
 app.get("/api/status", (req, res) => {
 	const currentTime = moment().unix();
-	const difference = Math.floor((currentTime - startupTime) / 60);
+	const SECONDS = Math.floor(currentTime - startupTime);
+	const uptime = new Date(SECONDS * 1000).toISOString().substr(11, 8);
 	const data = {
-		uptime: difference,
+		uptime: uptime,
 		reconnections: reconnStr(reconnections),
 		steamLoggedIn: steamClient.loggedOn,
 		mongoLoggedIn: mongoClient.isConnected(),
@@ -467,11 +469,12 @@ app.get("/api/status", (req, res) => {
 rl.on("line", (input) => {
 	if (input == "uptime") {
 		const currentTime = moment().unix();
-		const difference = (currentTime - startupTime) / 60;
-		logger.info(`Uptime: ${Math.floor(difference)} minutes, ${reconnStr(reconnections)}`);
+		const SECONDS = Math.floor(currentTime - startupTime);
+		const uptime = new Date(SECONDS * 1000).toISOString().substr(11, 8);
+		logger.info(`Uptime: ${uptime}, ${reconnStr(reconnections)}`);
 	}
 	else {
-		logger.info(`INPUT ERR: Unknown Command: ["${input}"]`);
+		logger.info(`INPUT ERR: Unknown Command: "${input}"`);
 	}
 });
 
@@ -479,10 +482,12 @@ process.on("SIGINT", function() {
 	logger.info("Shutting down....");
 	mongoClient.close(function() {
 		const currentTime = moment().unix();
+		const SECONDS = Math.floor(currentTime - startupTime);
+		const uptime = new Date(SECONDS * 1000).toISOString().substr(11, 8);
 		logger.info("MongoDB disconnected on app termination");
 		CSGO.exit(logger.info("CS:GO disconnected on app termination"));
 		steamClient.disconnect(logger.info("Steam disconnected on app termination"));
-		logger.info(`Server uptime was: ${Math.floor((currentTime - startupTime) / 60)} minutes and there were a total of ${reconnStr(reconnections)}`);
+		logger.info(`Server uptime was: ${uptime} and there were a total of ${reconnStr(reconnections)}`);
 		process.exit(0);
 	});
 });
