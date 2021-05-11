@@ -29,7 +29,7 @@ module.exports = class statusCommand extends Command {
 					.setColor("#FFA500")
 					.setTitle(`${this.client.user.username}'s status`)
 					.addFields(
-						{ name: "Server uptime ", value: `${data.uptime} minutes` },
+						{ name: "Server uptime ", value: `${data.uptime}` },
 						{ name: "Total reconnections to Steam", value: data.reconnections },
 						{ name: "Connected to Steam", value: data.steamLoggedIn },
 						{ name: "Connected to Database", value: data.mongoLoggedIn },
