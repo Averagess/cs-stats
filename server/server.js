@@ -344,6 +344,27 @@ app.post("/api/blacklistUser", async (req, res) => {
 	});
 });
 
+app.delete("/api/unblacklistUser", (req, res) => {
+	if (!req.body) {
+		return res.status(400).send("Request body was empty");
+	}
+	fs.readFile("blacklist.json", (err, data) => {
+		if (err) {
+			return logger.error("error while reading blacklist.json at /api/unblacklistUser");
+		}
+		const arr = JSON.parse(data);
+		if (arr.includes(req.body.userID)) {
+			const index = arr.indexOf(req.body.userID);
+			if (index > -1) {
+				arr.splice(index, 1);
+				fs.writeFile("blacklist.json", JSON.stringify(arr), () => {
+					return res.status(200).send("User blacklisted");
+				});
+			}
+		}
+	});
+});
+
 app.post("/api/testing", async (req, res) => {
 	logger.info("PlayerDB request received!");
 	const database = mongoClient.db("DiscordData");

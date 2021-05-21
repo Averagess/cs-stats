@@ -6,7 +6,7 @@ module.exports = class supportCommand extends Command {
 			name: "support",
 			group: "first",
 			memberName: "support",
-			description: "Replies with a invite link to the support / community server.",
+			description: "Replies with a invite link to the support server.",
 			argsPromptLimit: 0,
 			throttling: {
 				usages: 2,

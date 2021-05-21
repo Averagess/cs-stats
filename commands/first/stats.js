@@ -13,7 +13,7 @@ module.exports = class statsCommand extends Command {
 			name: "stats",
 			group: "first",
 			memberName: "stats",
-			description: "Replies with a set of CS:GO stats.",
+			description: "Replies with a set of a players CS:GO stats.",
 			argsPromptLimit: 0,
 			format: "<steamcommunity link> / <steamid64>",
 			args: [
@@ -90,14 +90,14 @@ module.exports = class statsCommand extends Command {
 						{ name: "Friendly", value: csgoData.commendation.cmd_friendly, inline: true },
 						{ name: "Teaching", value: csgoData.commendation.cmd_teaching, inline: true },
 						{ name: "Leader", value: csgoData.commendation.cmd_leader, inline: true },
-						{ name: "Real Playtime", value: Math.floor((steamStats[2].value / 60) / 60) + " hours" },
-						{ name: "Rank", value: csgoData.rankString },
+						{ name: "Rank", value: csgoData.rankString, inline: true },
+						{ name: "Competetive Wins", value: csgoData.wins, inline: true },
 					);
 				}
 				else {
-					embedMessage.addField("Real Playtime", Math.floor((steamStats[2].value / 60) / 60) + " hours");
-					embedMessage.addField("Rank", "if this is your account, see !cs updaterank");
+					embedMessage.addField("Rank", "if this is your account and want your rank to be shown, see !cs updaterank");
 				}
+				embedMessage.addField("Real Playtime", Math.floor((steamStats[2].value / 60) / 60) + " hours");
 				rp.post({
 					uri:"http://localhost:3000/api/data",
 					json:{ "command":"stats" },

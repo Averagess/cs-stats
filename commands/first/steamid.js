@@ -14,7 +14,7 @@ module.exports = class steamid extends Command {
 			name: "steamid",
 			group: "first",
 			memberName: "steamid",
-			description: "Replies with a steamid for the provided account.",
+			description: "Replies with a list of available SteamID's for the provided account.",
 			argsPromptLimit: 0,
 			format: "<steamcommunity link> / <steamid64>",
 			throttling: {
