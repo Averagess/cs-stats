@@ -14,7 +14,7 @@ module.exports = class profileCommand extends Command {
 			name: "profile",
 			group: "first",
 			memberName: "profile",
-			description: "Replies with info about submitted steam profile.",
+			description: "Replies with info about the submitted Steam profile.",
 			format: "<steamcommunity link> / <steamid64>",
 			argsPromptLimit: 0,
 			throttling: {
