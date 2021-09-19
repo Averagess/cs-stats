@@ -4,6 +4,7 @@ const path = require("path");
 const rp = require("request-promise");
 const fs = require("fs");
 const logger = require("./modules/logger.js");
+const { DiscordAPIError } = require("discord.js");
 dotenv.config();
 let blacklist;
 
@@ -50,12 +51,14 @@ client.on("ready", () => {
 
 });
 
+
+// Crashes if bot doesnt have proper permissions to send messages
 client.on("guildCreate", (guild) => {
 	try {
 		guild.systemChannel.send("Thanks for inviting me! You can see my commands by using !cs help");
 	}
 	catch (error) {
-		if (error == TypeError) {
+		if (error == TypeError || error == DiscordAPIError) {
 			return;
 		}
 		else {logger.error(`Unknown error raised while trying to send a message on guild join. err: ${error}`);}
