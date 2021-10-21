@@ -27,7 +27,7 @@ module.exports = class feedbackCommand extends Command {
 	run(message, { text }) {
 		const feedbackTextChannel = "835921497570541608";
 		if (text.length < 20 || text.length > 2000) {
-			return message.reply(`Feedback not submitted. The requirements are: minimum length of 20 and max of 2000. Your message's length was: ${text.length}`);
+			return message.reply(`Feedback not submitted. The requirements are: minimum length of 20 and a max of 2000. Your message's length was: ${text.length}`);
 		}
 		const feedbackEmbed = new MessageEmbed()
 			.setColor("#FFA500")
