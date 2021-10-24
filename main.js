@@ -4,6 +4,7 @@ const path = require("path");
 const rp = require("request-promise");
 const fs = require("fs");
 const logger = require("./modules/logger.js");
+const cron = require("node-cron");
 dotenv.config();
 let blacklist;
 
@@ -83,6 +84,37 @@ client.on("message", (msg) => {
 		rp.post("http://localhost:3000/api/prefixCount")
 			.catch(err => logger.error(`Unsuccesful transaction with back end.. error: ${err}`));
 	}
+});
+
+cron.schedule("0 * * * *", () => {
+	const getRandomActivity = () => {
+		logger.info("Selecting random activity..");
+		const randomIndex = Math.floor(Math.random() * 3);
+		const LISTENING = ["commands! !cs help", "!cs help"];
+		const PLAYING = ["CS:GO! !cs help", "with stats! !cs help", "de_mirage. !cs help", "de_dust. !cs help"];
+		const WATCHING = ["mid. !cs help", "leaderboards.. !cs help", "community servers. !cs help"];
+
+		if (randomIndex == 1) {
+			const index = Math.floor(Math.random() * LISTENING.length);
+			client.user.setActivity(LISTENING[index], { type: "LISTENING" })
+				.then(presence => logger.info(`Activity set to [Listening to: ${presence.activities[0].name}]`))
+				.catch(err => logger.error(err));
+		}
+		else if (randomIndex == 2) {
+			const index = Math.floor(Math.random() * PLAYING.length);
+			client.user.setActivity(PLAYING[index], { type: "PLAYING" })
+				.then(presence => logger.info(`Activity set to [Playing: ${presence.activities[0].name}]`))
+				.catch(err => logger.error(err));
+		}
+		else if (randomIndex == 3) {
+			const index = Math.floor(Math.random() * WATCHING.length);
+			client.user.setActivity(WATCHING[index], { type: "WATCHING" })
+				.then(presence => logger.info(`Activity set to [Watching: ${presence.activities[0].name}]`))
+				.catch(err => logger.error(err));
+		}
+
+	};
+	getRandomActivity();
 });
 
 process.on("SIGINT", function() {
