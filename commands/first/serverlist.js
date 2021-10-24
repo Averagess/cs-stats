@@ -23,7 +23,7 @@ module.exports = class MeowCommand extends Command {
 		const embed = new MessageEmbed();
 		this.client.guilds.cache.forEach(i => {
 			count++;
-			embed.addField(`${count}. ${i.name}`, `Members: ${i.memberCount}\nLarge: ${i.large}\nOwner: ${i.ownerID}\nBoosts: ${i.premiumSubscriptionCount}\nVerified: ${i.verified}\nJoined at: ${i.joinedAt}`);
+			embed.addField(`${count}. ${i.name}`, `Members: ${i.memberCount}\nLarge: ${i.large}\nOwner: ${i.ownerID}\nBoosts: ${i.premiumSubscriptionCount}\nVerified: ${i.verified}\nJoined at: ${i.joinedAt.toLocaleString()}`);
 		});
 		return message.say(embed);
 	}
