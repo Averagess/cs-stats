@@ -4,9 +4,9 @@ const { MessageEmbed } = require("discord.js");
 module.exports = class MeowCommand extends Command {
 	constructor(client) {
 		super(client, {
-			name: "listservers",
+			name: "serverlist",
 			group: "first",
-			memberName: "listservers",
+			memberName: "serverlist",
 			description: "Replies with current server list.",
 			argsPromptLimit: 0,
 			hidden: true,
@@ -23,7 +23,7 @@ module.exports = class MeowCommand extends Command {
 		const embed = new MessageEmbed();
 		this.client.guilds.cache.forEach(i => {
 			count++;
-			embed.addField(`${count}. ${i.name}`, `Members: [${i.memberCount}]`);
+			embed.addField(`${count}. ${i.name}`, `Members: ${i.memberCount}\nLarge: ${i.large}\nOwner: ${i.ownerID}\nBoosts: ${i.premiumSubscriptionCount}\nVerified: ${i.verified}\nJoined at: ${i.joinedAt}`);
 		});
 		return message.say(embed);
 	}
