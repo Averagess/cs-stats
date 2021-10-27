@@ -9,6 +9,7 @@ module.exports = class MeowCommand extends Command {
 			description: "Replies with a meow, kitty cat.",
 			argsPromptLimit: 0,
 			hidden: true,
+			ownerOnly: true,
 			throttling: {
 				usages: 2,
 				duration: 10,
