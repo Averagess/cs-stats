@@ -89,32 +89,34 @@ client.on("message", (msg) => {
 cron.schedule("0 * * * *", () => {
 	const getRandomActivity = () => {
 		logger.info("Selecting random activity..");
-		const randomIndex = Math.floor(Math.random() * 3);
+		const randomIndex = Math.floor(Math.random() * 2);
 		const LISTENING = ["commands! !cs help", "!cs help"];
 		const PLAYING = ["CS:GO! !cs help", "with stats! !cs help", "de_mirage. !cs help", "de_dust. !cs help"];
 		const WATCHING = ["mid. !cs help", "leaderboards.. !cs help", "community servers. !cs help"];
+		const status = [];
 
-		if (randomIndex == 1) {
+		if (randomIndex == 0) {
 			const index = Math.floor(Math.random() * LISTENING.length);
-			client.user.setActivity(LISTENING[index], { type: "LISTENING" })
-				.then(presence => logger.info(`Activity set to [Listening to: ${presence.activities[0].name}]`))
-				.catch(err => logger.error(err));
+			status[1] = "LISTENING";
+			status[0] = LISTENING[index];
+		}
+		else if (randomIndex == 1) {
+			const index = Math.floor(Math.random() * PLAYING.length);
+			status[1] = "PLAYING";
+			status[0] = PLAYING[index];
 		}
 		else if (randomIndex == 2) {
-			const index = Math.floor(Math.random() * PLAYING.length);
-			client.user.setActivity(PLAYING[index], { type: "PLAYING" })
-				.then(presence => logger.info(`Activity set to [Playing: ${presence.activities[0].name}]`))
-				.catch(err => logger.error(err));
-		}
-		else if (randomIndex == 3) {
 			const index = Math.floor(Math.random() * WATCHING.length);
-			client.user.setActivity(WATCHING[index], { type: "WATCHING" })
-				.then(presence => logger.info(`Activity set to [Watching: ${presence.activities[0].name}]`))
-				.catch(err => logger.error(err));
+			status[1] = "WATCHING";
+			status[0] = WATCHING[index];
 		}
-
+		return status;
 	};
-	getRandomActivity();
+
+	const status = getRandomActivity();
+	client.user.setActivity(status[0], { type: status[1] })
+		.then(presence => logger.info(`Activity set to [${presence.activities[0].type}: ${presence.activities[0].name}]`))
+		.catch(err => logger.error(err));
 });
 
 process.on("SIGINT", function() {
