@@ -38,9 +38,9 @@ module.exports = class steamid extends Command {
 			appid : "730",
 		};
 		if (text.toLowerCase().includes("steamcommunity.com/id/") || text.toLowerCase().includes("id/")) {
-			const regex = /(\w)\w*/g;
+			const regex = /(id[/])(\w*)/g;
 			const extracted = text.match(regex);
-			const URL = extracted.pop().replace("/", "");
+			const URL = extracted[0].replace("id/", "");
 			const qString = `http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${things.apiKey}&vanityurl=${URL}`;
 			// eslint-disable-next-line max-statements-per-line
 			await rp(qString).then(res => {const data = JSON.parse(res);things.target = data.response.steamid;}).catch(err => logger.err(err));
