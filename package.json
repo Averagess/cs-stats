@@ -24,6 +24,7 @@
     "forever": "^3.0.4",
     "hex2dec": "^1.1.2",
     "moment": "^2.29.1",
+    "moment-duration-format": "^2.3.2",
     "mongodb": "^3.6.9",
     "node-cron": "^3.0.0",
     "p-event": "^4.2.0",

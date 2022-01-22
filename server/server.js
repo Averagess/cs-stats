@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable max-nested-callbacks */
 /* eslint-disable indent */
 const { MongoClient } = require("mongodb");
@@ -9,6 +10,7 @@ const fs = require("fs");
 const readline = require("readline");
 const winston = require ("winston");
 const moment = require("moment");
+const momentDurationFormatSetup = require("moment-duration-format");
 const { waitFor } = require("wait-for-event");
 const { combine, timestamp, printf, prettyPrint, metadata, colorize } = winston.format;
 const { reconnStr } = require("../modules/modules");
@@ -206,8 +208,10 @@ steamFriends.on("friendMsg", async (steamid, msg, type) => {
 	if (type == 1 && msg == "!cs uptime" && steamid == "76561198116173009") {
 		const currentTime = moment().unix();
 		const SECONDS = Math.floor(currentTime - startupTime);
-		const uptime = new Date(SECONDS * 1000).toISOString().substr(11, 8);
-		return steamFriends.sendMessage(steamid, `Uptime: ${uptime}, ${reconnStr(reconnections)}`);
+		// const uptime = new Date(SECONDS * 1000).toISOString();
+		const duration = moment.duration(SECONDS, "seconds");
+		const uptime = duration.format("d [days], h [hours], m [minutes], [and] s [seconds]");
+		return steamFriends.sendMessage(steamid, `uptime: ${uptime}, ${reconnStr(reconnections)}`);
 	}
 	if (type == 1 && msg.startsWith("!cs")) {
 		steamFriends.sendMessage(steamid, "Unrecognized command.");
@@ -477,7 +481,9 @@ app.get("/api/fetchPlayerRank", async (req, res) => {
 app.get("/api/status", (req, res) => {
 	const currentTime = moment().unix();
 	const SECONDS = Math.floor(currentTime - startupTime);
-	const uptime = new Date(SECONDS * 1000).toISOString().substr(11, 8);
+	// const uptime = new Date(SECONDS * 1000).toISOString();
+	const duration = moment.duration(SECONDS, "seconds");
+	const uptime = duration.format("d [days], h [hours], m [minutes], [and] s [seconds]");
 	const data = {
 		uptime: uptime,
 		reconnections: reconnStr(reconnections),
@@ -491,7 +497,9 @@ rl.on("line", (input) => {
 	if (input == "uptime") {
 		const currentTime = moment().unix();
 		const SECONDS = Math.floor(currentTime - startupTime);
-		const uptime = new Date(SECONDS * 1000).toISOString().substr(11, 8);
+		// const uptime = new Date(SECONDS * 1000).toISOString();
+		const duration = moment.duration(SECONDS, "seconds");
+		const uptime = duration.format("d [days], h [hours], m [minutes], [and] s [seconds]");
 		logger.info(`Uptime: ${uptime}, ${reconnStr(reconnections)}`);
 	}
 	else {
@@ -504,7 +512,9 @@ process.on("SIGINT", function() {
 	mongoClient.close(function() {
 		const currentTime = moment().unix();
 		const SECONDS = Math.floor(currentTime - startupTime);
-		const uptime = new Date(SECONDS * 1000).toISOString().substr(11, 8);
+		// const uptime = new Date(SECONDS * 1000).toISOString();
+		const duration = moment.duration(SECONDS, "seconds");
+		const uptime = duration.format("d [days], h [hours], m [minutes], [and] s [seconds]");
 		logger.info("MongoDB disconnected on app termination");
 		CSGO.exit(logger.info("CS:GO disconnected on app termination"));
 		steamClient.disconnect(logger.info("Steam disconnected on app termination"));
