@@ -1,0 +1,27 @@
+GET  http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=A46EE240150FDB461D92C711B23C66BF&steamids=76561198116173009
+
+###
+
+GET http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=A46EE240150FDB461D92C711B23C66BF&steamid=76561198147946696&relationship=friend
+// statuscode 401 Unauthorized jos private!
+
+###
+
+GET http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=A46EE240150FDB461D92C711B23C66BF&vanityurl=opskinsbot20
+
+
+###
+
+GET https://public-api.tracker.gg/v2/csgo/standard/profile/steam/opskinsbot20
+TRN-Api-Key: 9b92c566-2aa5-4f1d-b4d4-eb0c12e0831e
+
+/([\d]){17}/g for steamid detection
+
+
+### 
+
+GET https://steamcommunity.com/inventory/76561198116173009/440/2?l=english&count=5000
+
+
+### 
+GET http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=A46EE240150FDB461D92C711B23C66BF&steamid=76561198116173009

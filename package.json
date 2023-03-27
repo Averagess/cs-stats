@@ -1,0 +1,42 @@
+{
+  "name": "cs-stats",
+  "version": "2.0.3",
+  "description": "Discord bot made for fetching CS:GO stats",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "csgo",
+    "bot",
+    "discord",
+    "discordjs"
+  ],
+  "author": "Average",
+  "license": "ISC",
+  "dependencies": {
+    "big-integer": "^1.6.48",
+    "csgo": "^1.5.15",
+    "discord.js": "^12.5.1",
+    "discord.js-commando": "git+https://github.com/Averagess/Commando.git",
+    "dotenv": "^8.6.0",
+    "express": "^4.17.1",
+    "forever": "^3.0.4",
+    "hex2dec": "^1.1.2",
+    "moment": "^2.29.1",
+    "moment-duration-format": "^2.3.2",
+    "mongodb": "^3.6.9",
+    "node-cron": "^3.0.0",
+    "p-event": "^4.2.0",
+    "querystring": "^0.2.1",
+    "r2": "^2.0.1",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "wait-for-event": "^2.0.1",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.5"
+  },
+  "devDependencies": {
+    "eslint": "^7.29.0"
+  }
+}
